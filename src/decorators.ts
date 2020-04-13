@@ -17,7 +17,7 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
 
     let properties : any = {};
 
-    for (const prop in obj) {
+    for (const prop of Object.getOwnPropertyNames(obj)) {
       const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
       if (metaData && Object.keys(metaData).length) {
         const {className, schema} = metaData;
@@ -56,8 +56,6 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
       const ajv: AJV.Ajv = new AJV({allErrors: true});
       const properties = addSetters(ajv, obj, args);
       schema = { type: "object", required: Object.keys(properties), properties };
-      //console.log(JSON.stringify(schema));
-      //@ts-ignore
       return obj;
     }
     func.prototype = constructorFunction.prototype;

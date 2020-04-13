@@ -9,7 +9,7 @@ const lib_1 = require("./lib");
 function validate(constructorFunction) {
     const addSetters = (ajv, obj, args) => {
         let properties = {};
-        for (const prop in obj) {
+        for (const prop of Object.getOwnPropertyNames(obj)) {
             const metaData = Reflect.getMetadata("validation", obj, prop);
             if (metaData && Object.keys(metaData).length) {
                 const { className, schema } = metaData;
@@ -44,8 +44,6 @@ function validate(constructorFunction) {
             const ajv = new AJV({ allErrors: true });
             const properties = addSetters(ajv, obj, args);
             schema = { type: "object", required: Object.keys(properties), properties };
-            //console.log(JSON.stringify(schema));
-            //@ts-ignore
             return obj;
         };
         func.prototype = constructorFunction.prototype;
