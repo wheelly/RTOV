@@ -1,0 +1,32 @@
+{
+  "name": "RTOV",
+  "version": "1.0.0",
+  "description": "Runtime Object Validation Package",
+  "main": "dist/rtov.js",
+  "author": "Boris Kolesnikov",
+  "license": "MIT",
+  "dependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/node": "^13.11.1",
+    "ajv": "^6.12.0",
+    "reflect-metadata": "^0.1.13",
+    "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=12.14"
+  },
+  "scripts": {
+    "build": "tsc --build ./tsconfig.json",
+    "test": "tsc --build tsconfig.json && mocha ./dist/tests",
+    "clean": "rm -rf dist *.tsbuildinfo yarn.lock"
+  },
+  "files": [
+    "dist"
+  ],
+  "typings": "./dist/rtov.d.ts"
+}
