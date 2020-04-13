@@ -34,7 +34,6 @@ describe('ExampleUser', function() {
         }, ExampleUserData);
 
         console.log( JSON.stringify((user as unknown as GetSchema).getSchema()) );
-
         (user as any).id = "ANY"
       });
     });
