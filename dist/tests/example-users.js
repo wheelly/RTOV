@@ -28,6 +28,7 @@ describe('ExampleUser', function () {
                     id: 2,
                     data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
                 }, data_1.ExampleUserData);
+                console.log(JSON.stringify(user.getSchema()));
                 user.id = "ANY";
             });
         });
@@ -47,7 +48,7 @@ describe('ExampleUser', function () {
                 console.log(user);
                 //@ts-ignore
                 user.data = { currency: "ANY" };
-            }, 'FUCK');
+            }, '[{"keyword":"enum","dataPath":".currency","schemaPath":"#/properties/currency/enum","params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"},{"keyword":"required","dataPath":"","schemaPath":"#/required","params":{"missingProperty":"name"},"message":"should have required property \'name\'"},{"keyword":"required","dataPath":"","schemaPath":"#/required","params":{"missingProperty":"surname"},"message":"should have required property \'surname\'"}]');
         });
     });
 });
