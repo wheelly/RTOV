@@ -2,7 +2,7 @@
   "name": "RTOV",
   "version": "1.0.0",
   "description": "Runtime Object Validation Library",
-  "main": "dist/rtov.js",
+  "main": "dist/RTOV.js",
   "author": "Boris Kolesnikov",
   "license": "MIT",
   "dependencies": {
@@ -22,11 +22,11 @@
   },
   "scripts": {
     "build": "tsc --build ./tsconfig.json",
-    "test": "tsc --build tsconfig.json && mocha ./dist/tests",
+    "tests": "tsc --build tsconfig.json && mocha ./dist/tests",
     "clean": "rm -rf dist *.tsbuildinfo yarn.lock"
   },
   "files": [
     "dist"
   ],
-  "typings": "./dist/rtov.d.ts"
+  "typings": "./dist/RTOV.d.ts"
 }

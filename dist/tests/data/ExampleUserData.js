@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const rtov_1 = require("../../rtov");
+const RTOV_1 = require("../../RTOV");
 let ExampleUserData = class ExampleUserData {
     constructor() {
         this.currency = "ILS";
@@ -18,22 +18,22 @@ let ExampleUserData = class ExampleUserData {
     }
 };
 __decorate([
-    rtov_1.property({
+    RTOV_1.property({
         type: "string",
         enum: ["ILS", "EUR", "USD"]
     }),
     __metadata("design:type", String)
 ], ExampleUserData.prototype, "currency", void 0);
 __decorate([
-    rtov_1.property({ type: "string" }),
+    RTOV_1.property({ type: "string" }),
     __metadata("design:type", String)
 ], ExampleUserData.prototype, "name", void 0);
 __decorate([
-    rtov_1.property({ type: "string" }),
+    RTOV_1.property({ type: "string" }),
     __metadata("design:type", String)
 ], ExampleUserData.prototype, "surname", void 0);
 ExampleUserData = __decorate([
-    rtov_1.validate
+    RTOV_1.validate
 ], ExampleUserData);
 exports.ExampleUserData = ExampleUserData;
 //# sourceMappingURL=ExampleUserData.js.map

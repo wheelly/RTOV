@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("./data");
 const chai_1 = require("chai");
+const RTOV_1 = require("../RTOV");
 describe('ExampleUser', function () {
     describe('Property Instancing Validation', function () {
         it('validate prop creation - incorrect currency', function () {
@@ -28,7 +29,7 @@ describe('ExampleUser', function () {
                     id: 2,
                     data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
                 }, data_1.ExampleUserData);
-                console.log(JSON.stringify(user.getSchema()));
+                console.log(JSON.stringify(RTOV_1.getSchema(user)));
                 user.id = "ANY";
             });
         });

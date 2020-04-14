@@ -1,7 +1,14 @@
 import 'reflect-metadata';
 import * as AJV from "ajv";
 
-import { debug} from "./lib";
+import {debug} from "./lib";
+
+export const getSchema = (object: Object): Object | void => {
+  if (object.hasOwnProperty("getSchema") && typeof (object as any).getSchema === 'function') {
+    //@ts-ignore
+    return object.getSchema();
+  }
+}
 
 interface MetaData {
   className: string
@@ -59,8 +66,10 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
       return obj;
     }
     func.prototype = constructorFunction.prototype;
-    func.prototype.getSchema = function() { return schema };
-    return new func();
+
+    const obj =  new func();
+    obj.getSchema = () : Object => { return schema }
+    return obj;
   }
   newConstructorFunction.prototype = constructorFunction.prototype;
   return newConstructorFunction;

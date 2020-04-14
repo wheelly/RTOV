@@ -1,4 +1,4 @@
-import {validate, property} from "../../rtov";
+import {validate, property} from "../../RTOV";
 
 @validate
 export class ExampleUserData {

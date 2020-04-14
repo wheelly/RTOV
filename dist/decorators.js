@@ -3,6 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const AJV = require("ajv");
 const lib_1 = require("./lib");
+exports.getSchema = (object) => {
+    if (object.hasOwnProperty("getSchema") && typeof object.getSchema === 'function') {
+        //@ts-ignore
+        return object.getSchema();
+    }
+};
 /*
     This is a class decorator the instances of which you want to validate runtime
  */
@@ -47,8 +53,9 @@ function validate(constructorFunction) {
             return obj;
         };
         func.prototype = constructorFunction.prototype;
-        func.prototype.getSchema = function () { return schema; };
-        return new func();
+        const obj = new func();
+        obj.getSchema = () => { return schema; };
+        return obj;
     };
     newConstructorFunction.prototype = constructorFunction.prototype;
     return newConstructorFunction;

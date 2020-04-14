@@ -1,4 +1,4 @@
-import {validate, property} from "../../rtov";
+import {validate, property} from "../../RTOV";
 import { ModelConstructor } from "./common";
 
 @validate

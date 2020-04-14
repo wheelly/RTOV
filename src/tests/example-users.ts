@@ -1,7 +1,6 @@
 import {ExampleUser, ExampleUserData} from "./data";
-
 import {assert} from 'chai';
-import {GetSchema} from "../lib";
+import { getSchema } from "../RTOV";
 
 describe('ExampleUser', function() {
 
@@ -33,7 +32,7 @@ describe('ExampleUser', function() {
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
         }, ExampleUserData);
 
-        console.log( JSON.stringify((user as unknown as GetSchema).getSchema()) );
+        console.log( JSON.stringify(getSchema(user)) );
         (user as any).id = "ANY"
       });
     });

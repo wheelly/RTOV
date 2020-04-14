@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const rtov_1 = require("../../rtov");
+const RTOV_1 = require("../../RTOV");
 let ExampleUser = class ExampleUser {
     constructor(args, embeddedConstructor) {
         this.id = 0;
@@ -19,19 +19,19 @@ let ExampleUser = class ExampleUser {
     }
 };
 __decorate([
-    rtov_1.property({
+    RTOV_1.property({
         type: "number", minimum: 1
     }),
     __metadata("design:type", Number)
 ], ExampleUser.prototype, "id", void 0);
 __decorate([
-    rtov_1.property({
+    RTOV_1.property({
         type: "object",
     }),
     __metadata("design:type", Object)
 ], ExampleUser.prototype, "data", void 0);
 ExampleUser = __decorate([
-    rtov_1.validate,
+    RTOV_1.validate,
     __metadata("design:paramtypes", [Object, Object])
 ], ExampleUser);
 exports.ExampleUser = ExampleUser;
