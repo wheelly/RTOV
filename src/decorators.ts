@@ -42,13 +42,14 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
         const schemaId = className + ':' + prop
         debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(properties[prop])}`);
         ajv.addSchema({"$id": schemaId, ...properties[prop]});
+
         const propValidator = (data: any) => {
           const validate = ajv.getSchema(schemaId);
           if (validate && !validate(data)) {
             throw new Error(JSON.stringify(validate.errors));
           }
           Object.defineProperty(obj, getPropName(prop), {
-            value: isComplexType ? obj[prop] : args[prop],
+            value: isComplexType ? obj[prop] : data,
             writable: false
           });
         };

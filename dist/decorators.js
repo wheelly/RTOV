@@ -37,7 +37,7 @@ function validate(constructorFunction) {
                         throw new Error(JSON.stringify(validate.errors));
                     }
                     Object.defineProperty(obj, getPropName(prop), {
-                        value: isComplexType ? obj[prop] : args[prop],
+                        value: isComplexType ? obj[prop] : data,
                         writable: false
                     });
                 };
