@@ -1,12 +1,15 @@
 import 'reflect-metadata';
 import * as AJV from "ajv";
-
 import {debug} from "./lib";
 
+const PROP_PREFIX = "__";
+
+const getPropName = (name: string) => PROP_PREFIX + name;
+
 export const getSchema = (object: Object): Object | void => {
-  if (object.hasOwnProperty("getSchema") && typeof (object as any).getSchema === 'function') {
+  if (object.hasOwnProperty(getPropName("schema"))) {
     //@ts-ignore
-    return object.getSchema();
+    return object[getPropName("schema")];
   }
 }
 
@@ -20,21 +23,41 @@ interface MetaData {
  */
 export function validate<T extends { new(...constructorArgs: any[]): any }>(constructorFunction: T) {
 
+  const isComplexType = (data: any) => typeof data === 'object';
+
+  const setReadOnlyProperty = (obj: any, prop: string, data: any) => {
+    Object.defineProperty(obj, getPropName(prop), {
+      value: data,
+      writable: false,
+      configurable: true //let it be redefined
+    });
+  }
+
+  const getPublicProperties = (obj: any) => Object.getOwnPropertyNames(obj).filter((prop) => !prop.startsWith(PROP_PREFIX));
+
+  const setPropertyRecursive = (obj: any, prop: string, data: any) => {
+    if (isComplexType(obj[prop])) {
+      for (const subProp of getPublicProperties(obj[prop])) {
+        setPropertyRecursive(obj[prop], subProp, data[subProp]);
+      }
+      setReadOnlyProperty(obj, prop, obj[prop]);
+    } else {
+      setReadOnlyProperty(obj, prop, data);
+    }
+  }
+
   const addSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
 
-      const getPropName = (name: string) => "__" + name;
+    let properties: any = {};
 
-      let properties : any = {};
-
-    for (const prop of Object.getOwnPropertyNames(obj)) {
+    for (const prop of getPublicProperties(obj)) {
       const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
       if (metaData && Object.keys(metaData).length) {
         const {className, schema} = metaData;
-        const isComplexType = typeof obj[prop] === 'object';
 
-        if ( isComplexType ) {
+        if (isComplexType(obj[prop])) {
           const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
-          properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
+          properties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
         } else {
           properties[prop] = schema;
         }
@@ -48,10 +71,7 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
           if (validate && !validate(data)) {
             throw new Error(JSON.stringify(validate.errors));
           }
-          Object.defineProperty(obj, getPropName(prop), {
-            value: isComplexType ? obj[prop] : data,
-            writable: false
-          });
+          setPropertyRecursive(obj, prop, data);
         };
 
         propValidator(args[prop]); //validate on construction
@@ -65,24 +85,26 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
   };
 
   //new constructor function
-  let newConstructorFunction: any = function (args : T, extra?: any[]) {
+  let newConstructorFunction: any = function (args: T, extra?: any[]) {
     //overriding constructor - setters instead of properties
     let schema = {};
     let func: any = function () {
       let obj = new constructorFunction(args, extra);
       const ajv: AJV.Ajv = new AJV({allErrors: true});
       const properties = addSetters(ajv, obj, args);
-      schema = { type: "object", required: Object.keys(properties), properties };
+      schema = {type: "object", required: Object.keys(properties), properties};
       return obj;
     }
     func.prototype = constructorFunction.prototype;
 
-    const obj =  new func();
-    obj.getSchema = () : Object => { return schema }
+    const obj = new func();
+    setReadOnlyProperty(obj, 'schema', schema);
     return obj;
   }
   newConstructorFunction.prototype = constructorFunction.prototype;
   return newConstructorFunction;
+
+
 }
 
 /*
@@ -92,6 +114,6 @@ export function property(schema: Object) {
   return function addValidationRule(target: any, propertyKey: string) {
     const className = target.constructor.name;
     debug(() => `@property -> ${className}.${propertyKey} schema: ${JSON.stringify(schema)}`);
-    Reflect.defineMetadata("validation", { className, schema } , target, propertyKey);
+    Reflect.defineMetadata("validation", {className, schema}, target, propertyKey);
   }
 }

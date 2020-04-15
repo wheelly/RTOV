@@ -3,25 +3,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const AJV = require("ajv");
 const lib_1 = require("./lib");
+const PROP_PREFIX = "__";
+const getPropName = (name) => PROP_PREFIX + name;
 exports.getSchema = (object) => {
-    if (object.hasOwnProperty("getSchema") && typeof object.getSchema === 'function') {
+    if (object.hasOwnProperty(getPropName("schema"))) {
         //@ts-ignore
-        return object.getSchema();
+        return object[getPropName("schema")];
     }
 };
 /*
     This is a class decorator the instances of which you want to validate runtime
  */
 function validate(constructorFunction) {
+    const isComplexType = (data) => typeof data === 'object';
+    const setReadOnlyProperty = (obj, prop, data) => {
+        Object.defineProperty(obj, getPropName(prop), {
+            value: data,
+            writable: false,
+            configurable: true //let it be redefined
+        });
+    };
+    const getPublicProperties = (obj) => Object.getOwnPropertyNames(obj).filter((prop) => !prop.startsWith(PROP_PREFIX));
+    const setPropertyRecursive = (obj, prop, data) => {
+        if (isComplexType(obj[prop])) {
+            for (const subProp of getPublicProperties(obj[prop])) {
+                setPropertyRecursive(obj[prop], subProp, data[subProp]);
+            }
+            setReadOnlyProperty(obj, prop, obj[prop]);
+        }
+        else {
+            setReadOnlyProperty(obj, prop, data);
+        }
+    };
     const addSetters = (ajv, obj, args) => {
-        const getPropName = (name) => "__" + name;
         let properties = {};
-        for (const prop of Object.getOwnPropertyNames(obj)) {
+        for (const prop of getPublicProperties(obj)) {
             const metaData = Reflect.getMetadata("validation", obj, prop);
             if (metaData && Object.keys(metaData).length) {
                 const { className, schema } = metaData;
-                const isComplexType = typeof obj[prop] === 'object';
-                if (isComplexType) {
+                if (isComplexType(obj[prop])) {
                     const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
                     properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
                 }
@@ -36,10 +56,7 @@ function validate(constructorFunction) {
                     if (validate && !validate(data)) {
                         throw new Error(JSON.stringify(validate.errors));
                     }
-                    Object.defineProperty(obj, getPropName(prop), {
-                        value: isComplexType ? obj[prop] : data,
-                        writable: false
-                    });
+                    setPropertyRecursive(obj, prop, data);
                 };
                 propValidator(args[prop]); //validate on construction
                 obj.__defineSetter__(prop, propValidator);
@@ -61,7 +78,7 @@ function validate(constructorFunction) {
         };
         func.prototype = constructorFunction.prototype;
         const obj = new func();
-        obj.getSchema = () => { return schema; };
+        setReadOnlyProperty(obj, 'schema', schema);
         return obj;
     };
     newConstructorFunction.prototype = constructorFunction.prototype;

@@ -2,7 +2,7 @@ import {ExampleUser, ExampleUserData} from "./data";
 import {assert} from 'chai';
 import { getSchema } from "../RTOV";
 
-describe('ExampleUser', function() {
+describe('ExampleUser Invalid Data', function() {
 
   describe('Property Instancing Validation', function() {
     it('validate prop creation - incorrect currency', function() {
