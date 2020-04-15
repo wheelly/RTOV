@@ -3,7 +3,7 @@ import {validate, property} from "../../RTOV";
 export type CurrencyType = "ILS" | "EUR" | "USD" | "ANY"
 
 @validate
-export class ExampleUserData {
+export class ExampleObjectData {
   @property({
     type: "string",
     enum: ["ILS", "EUR", "USD"]

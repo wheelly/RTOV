@@ -36,14 +36,24 @@ function validate(constructorFunction) {
         }
     };
     const addSetters = (ajv, obj, args) => {
+        const getMetadata = (obj, prop) => {
+            const metaData = Reflect.getMetadata("validation", obj, prop);
+            return metaData && Object.keys(metaData).length ? metaData : undefined;
+        };
         let properties = {};
         for (const prop of getPublicProperties(obj)) {
-            const metaData = Reflect.getMetadata("validation", obj, prop);
-            if (metaData && Object.keys(metaData).length) {
+            const metaData = getMetadata(obj, prop);
+            if (metaData) {
                 const { className, schema } = metaData;
                 if (isComplexType(obj[prop])) {
-                    const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
-                    properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
+                    if (Array.isArray(obj[prop])) {
+                        lib_1.addItemsSetters(ajv, obj[prop], args[prop], metaData);
+                        properties[prop] = schema;
+                    }
+                    else {
+                        const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
+                        properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
+                    }
                 }
                 else {
                     properties[prop] = schema;

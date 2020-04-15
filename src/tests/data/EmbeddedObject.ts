@@ -2,7 +2,7 @@ import {validate, property} from "../../RTOV";
 import { ModelConstructor } from "./common";
 
 @validate
-export class ExampleUser<T extends {}> {
+export class EmbeddedObject<T extends {}> {
 
   @property({
     type: "number", minimum: 1
@@ -16,7 +16,7 @@ export class ExampleUser<T extends {}> {
   })
   data : T;
 
-  constructor(args : Partial<ExampleUser<T>>, embeddedConstructor: ModelConstructor<T>) {
+  constructor(args : Partial<EmbeddedObject<T>>, embeddedConstructor: ModelConstructor<T>) {
     // mandatory here to validate embedded data
     this.data = new embeddedConstructor(args.data);
   }

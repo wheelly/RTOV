@@ -1,25 +1,25 @@
-import {ExampleUser, ExampleUserData} from "./data";
+import {EmbeddedObject, ExampleObjectData} from "./data";
 import {assert} from 'chai';
 import { getSchema } from "../RTOV";
 
-describe('ExampleUser Invalid Data', function() {
+describe('EmbeddedObject Invalid Data', function() {
 
   describe('Property Instancing Validation', function() {
     it('validate prop creation - incorrect currency', function() {
       assert.throw(() => {
-        const user = new ExampleUser<ExampleUserData>({
+        new EmbeddedObject<ExampleObjectData>({
           id: 2,
           data: {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleUserData);
+        }, ExampleObjectData);
       }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum","params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]');
     });
 
     it('validate embedded prop access', function() {
       assert.throw(() => {
-        const user = new ExampleUser<ExampleUserData>({
+        const user = new EmbeddedObject<ExampleObjectData>({
           id: 0,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleUserData);
+        }, ExampleObjectData);
       }, '[{"keyword":"minimum","dataPath":"","schemaPath":"#/minimum","params":{"comparison":">=","limit":1,"exclusive":false},"message":"should be >= 1"}]');
     });
   });
@@ -27,10 +27,10 @@ describe('ExampleUser Invalid Data', function() {
   describe('Property Access Validation', function() {
     it('validate prop access', function() {
       assert.throw(() => {
-        let user = new ExampleUser<ExampleUserData>({
+        let user = new EmbeddedObject<ExampleObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleUserData);
+        }, ExampleObjectData);
 
         console.log(JSON.stringify(user));
         console.log( JSON.stringify(getSchema(user)) );
@@ -40,18 +40,18 @@ describe('ExampleUser Invalid Data', function() {
 
     it('validate embedded prop access', function() {
       assert.throw(() => {
-        let user = new ExampleUser<ExampleUserData>({
+        let user = new EmbeddedObject<ExampleObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleUserData);
+        }, ExampleObjectData);
         user.data.currency = "ANY"
       });
 
       assert.throw(() => {
-        let user = new ExampleUser<ExampleUserData>({
+        let user = new EmbeddedObject<ExampleObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleUserData);
+        }, ExampleObjectData);
 
         //@ts-ignore
         user.data = { currency: "ANY" }

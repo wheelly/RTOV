@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import * as AJV from "ajv";
-import {debug} from "./lib";
+import {MetaData, addItemsSetters, debug} from "./lib";
 
 const PROP_PREFIX = "__";
 
@@ -13,10 +13,6 @@ export const getSchema = (object: Object): Object | void => {
   }
 }
 
-interface MetaData {
-  className: string
-  schema: Object
-}
 
 /*
     This is a class decorator the instances of which you want to validate runtime
@@ -48,16 +44,26 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
 
   const addSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
 
+    const getMetadata = (obj : any, prop: string) => {
+      const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
+      return metaData && Object.keys(metaData).length ? metaData : undefined;
+    };
+
     let properties: any = {};
 
     for (const prop of getPublicProperties(obj)) {
-      const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
-      if (metaData && Object.keys(metaData).length) {
+      const metaData = getMetadata(obj, prop);
+      if ( metaData ) {
         const {className, schema} = metaData;
 
         if (isComplexType(obj[prop])) {
-          const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
-          properties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
+          if ( Array.isArray(obj[prop]) ) {
+            addItemsSetters(ajv, obj[prop], args[prop], metaData);
+            properties[prop] = schema;
+          } else {
+            const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
+            properties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
+          }
         } else {
           properties[prop] = schema;
         }
