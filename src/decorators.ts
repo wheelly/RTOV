@@ -22,14 +22,17 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
 
   const addSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
 
-    let properties : any = {};
+      const getPropName = (name: string) => "__" + name;
+
+      let properties : any = {};
 
     for (const prop of Object.getOwnPropertyNames(obj)) {
       const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
       if (metaData && Object.keys(metaData).length) {
         const {className, schema} = metaData;
+        const isComplexType = typeof obj[prop] === 'object';
 
-        if ( typeof obj[prop] === 'object' ) {
+        if ( isComplexType ) {
           const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
           properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
         } else {
@@ -44,9 +47,15 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
           if (validate && !validate(data)) {
             throw new Error(JSON.stringify(validate.errors));
           }
+          Object.defineProperty(obj, getPropName(prop), {
+            value: isComplexType ? obj[prop] : args[prop],
+            writable: false
+          });
         };
+
         propValidator(args[prop]); //validate on construction
         obj.__defineSetter__(prop, propValidator);
+        obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
       }
     }
 

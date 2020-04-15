@@ -32,6 +32,7 @@ describe('ExampleUser', function() {
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
         }, ExampleUserData);
 
+        console.log(JSON.stringify(user));
         console.log( JSON.stringify(getSchema(user)) );
         (user as any).id = "ANY"
       });

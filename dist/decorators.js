@@ -14,12 +14,14 @@ exports.getSchema = (object) => {
  */
 function validate(constructorFunction) {
     const addSetters = (ajv, obj, args) => {
+        const getPropName = (name) => "__" + name;
         let properties = {};
         for (const prop of Object.getOwnPropertyNames(obj)) {
             const metaData = Reflect.getMetadata("validation", obj, prop);
             if (metaData && Object.keys(metaData).length) {
                 const { className, schema } = metaData;
-                if (typeof obj[prop] === 'object') {
+                const isComplexType = typeof obj[prop] === 'object';
+                if (isComplexType) {
                     const embeddedProperties = addSetters(ajv, obj[prop], args[prop]);
                     properties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
                 }
@@ -34,9 +36,14 @@ function validate(constructorFunction) {
                     if (validate && !validate(data)) {
                         throw new Error(JSON.stringify(validate.errors));
                     }
+                    Object.defineProperty(obj, getPropName(prop), {
+                        value: isComplexType ? obj[prop] : args[prop],
+                        writable: false
+                    });
                 };
                 propValidator(args[prop]); //validate on construction
                 obj.__defineSetter__(prop, propValidator);
+                obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
             }
         }
         return properties;

@@ -29,6 +29,7 @@ describe('ExampleUser', function () {
                     id: 2,
                     data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
                 }, data_1.ExampleUserData);
+                console.log(JSON.stringify(user));
                 console.log(JSON.stringify(RTOV_1.getSchema(user)));
                 user.id = "ANY";
             });
