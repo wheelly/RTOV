@@ -4,4 +4,5 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./decorators"));
+__export(require("./rtov-array"));
 //# sourceMappingURL=RTOV.js.map

@@ -4,10 +4,44 @@ import {
   setPropertyRecursive,
   isComplexType,
   getPublicProperties,
-  addItemsSetters,
   debug,
   MetaData
 } from "./";
+
+
+export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValue: any, prop: string) => {
+  let schemaProperties : any = {}
+  const {className, schema} = metaData;
+  if (isComplexType(obj[prop]) && !Array.isArray(obj[prop])) {
+    // if (Array.isArray(obj[prop])) {
+    //   addItemsSetters(ajv, obj[prop], args[prop], metaData);
+    //   properties[prop] = schema;
+    // } else {
+    const embeddedProperties = addObjectSetters(ajv, obj[prop], newValue);
+    schemaProperties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
+//        }
+  } else {
+    schemaProperties[prop] = schema;
+  }
+
+  const schemaId = className + ':' + prop
+  debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(schemaProperties[prop])}`);
+  ajv.addSchema({"$id": schemaId, ...schemaProperties[prop]});
+
+  const propValidator = (data: any) => {
+    const validate = ajv.getSchema(schemaId);
+    if (validate && !validate(data)) {
+      throw new Error(JSON.stringify(validate.errors));
+    }
+    setPropertyRecursive(obj, prop, data);
+  };
+
+  propValidator(newValue); //validate on construction
+  obj.__defineSetter__(prop, propValidator);
+  obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
+  return schemaProperties;
+}
+
 
 export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
 
@@ -16,43 +50,15 @@ export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
     return metaData && Object.keys(metaData).length ? metaData : undefined;
   };
 
-  let properties: any = {};
+  let schemaProperties: any = {};
 
   for (const prop of getPublicProperties(obj)) {
     const metaData = getMetadata(obj, prop);
     if (metaData) {
-      const {className, schema} = metaData;
-
-      if (isComplexType(obj[prop])) {
-        if (Array.isArray(obj[prop])) {
-          addItemsSetters(ajv, obj[prop], args[prop], metaData);
-          properties[prop] = schema;
-        } else {
-          const embeddedProperties = addObjectSetters(ajv, obj[prop], args[prop]);
-          properties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
-        }
-      } else {
-        properties[prop] = schema;
-      }
-
-      const schemaId = className + ':' + prop
-      debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(properties[prop])}`);
-      ajv.addSchema({"$id": schemaId, ...properties[prop]});
-
-      const propValidator = (data: any) => {
-        const validate = ajv.getSchema(schemaId);
-        if (validate && !validate(data)) {
-          throw new Error(JSON.stringify(validate.errors));
-        }
-        setPropertyRecursive(obj, prop, data);
-      };
-
-      propValidator(args[prop]); //validate on construction
-      obj.__defineSetter__(prop, propValidator);
-      obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
+      schemaProperties = Object.assign(schemaProperties, setValidator(ajv, metaData, obj, args[prop], prop));
     }
   }
 
-  return properties;
+  return schemaProperties;
 
 };
