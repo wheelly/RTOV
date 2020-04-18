@@ -5,21 +5,19 @@ import {
   isComplexType,
   getPublicProperties,
   debug,
-  MetaData
+  MetaData,
+  SchemaOfArray, setReadOnlyProperty,
 } from "./";
 
+import { RtOVArray } from "../RTOV";
 
 export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValue: any, prop: string) => {
   let schemaProperties : any = {}
   const {className, schema} = metaData;
-  if (isComplexType(obj[prop]) && !Array.isArray(obj[prop])) {
-    // if (Array.isArray(obj[prop])) {
-    //   addItemsSetters(ajv, obj[prop], args[prop], metaData);
-    //   properties[prop] = schema;
-    // } else {
+
+  if (isComplexType(obj[prop]) && ! Array.isArray(obj[prop])) {
     const embeddedProperties = addObjectSetters(ajv, obj[prop], newValue);
     schemaProperties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
-//        }
   } else {
     schemaProperties[prop] = schema;
   }
@@ -33,7 +31,15 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
     if (validate && !validate(data)) {
       throw new Error(JSON.stringify(validate.errors));
     }
-    setPropertyRecursive(obj, prop, data);
+
+    const schemaOfArray = schema as SchemaOfArray;
+
+    if ( Array.isArray(obj[prop]) && schemaOfArray.type && schemaOfArray.type === 'array') {
+      debug(() => 'Array with type array in schema converting to RtOVArray');
+      setReadOnlyProperty(obj, prop, new RtOVArray<any>(data, metaData, ajv));
+    } else {
+      setPropertyRecursive(obj, prop, data);
+    }
   };
 
   propValidator(newValue); //validate on construction

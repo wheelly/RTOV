@@ -1,17 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require("./");
+const RTOV_1 = require("../RTOV");
 exports.setValidator = (ajv, metaData, obj, newValue, prop) => {
     let schemaProperties = {};
     const { className, schema } = metaData;
     if (_1.isComplexType(obj[prop]) && !Array.isArray(obj[prop])) {
-        // if (Array.isArray(obj[prop])) {
-        //   addItemsSetters(ajv, obj[prop], args[prop], metaData);
-        //   properties[prop] = schema;
-        // } else {
         const embeddedProperties = exports.addObjectSetters(ajv, obj[prop], newValue);
         schemaProperties[prop] = { ...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties };
-        //        }
     }
     else {
         schemaProperties[prop] = schema;
@@ -24,7 +20,14 @@ exports.setValidator = (ajv, metaData, obj, newValue, prop) => {
         if (validate && !validate(data)) {
             throw new Error(JSON.stringify(validate.errors));
         }
-        _1.setPropertyRecursive(obj, prop, data);
+        const schemaOfArray = schema;
+        if (Array.isArray(obj[prop]) && schemaOfArray.type && schemaOfArray.type === 'array') {
+            _1.debug(() => 'Array with type array in schema converting to RtOVArray');
+            _1.setReadOnlyProperty(obj, prop, new RTOV_1.RtOVArray(data, metaData, ajv));
+        }
+        else {
+            _1.setPropertyRecursive(obj, prop, data);
+        }
     };
     propValidator(newValue); //validate on construction
     obj.__defineSetter__(prop, propValidator);

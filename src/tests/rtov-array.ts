@@ -1,9 +1,10 @@
 import {RtOVArray } from "../rtov-array";
 import {assert, expect} from 'chai';
+import {EmbeddedObject, ExampleObjectData} from "./data";
 
-describe('RtOVArray functionality', function() {
+describe('RtOVArray basic functionality', () => {
 
-  it('RtOVArray creation and assignment check', function () {
+  describe('Instancing and assignment', () => {
 
     const schema = {
       type: "array",
@@ -14,24 +15,64 @@ describe('RtOVArray functionality', function() {
     };
 
     const array = [42, "wheelly", -1];
-    const rtOVArray = new RtOVArray<string | number>([42, "wheelly", -1], {className: 'test', schema});
-    expect(rtOVArray.toJSON()).to.deep.equal(array);
-    console.log(JSON.stringify(rtOVArray));
+    const rtOVArray = new RtOVArray<string | number>(array, {className: 'test', schema});
 
-    rtOVArray[1] = rtOVArray[0] as number + 1;
+    it('Instancing', () => {
+      expect(rtOVArray.toJSON()).to.deep.equal(array);
+      console.log(JSON.stringify(rtOVArray));
+    })
 
-    expect(rtOVArray[1]).to.equal(43);
+    it( 'correct assignment', () => {
+      rtOVArray[1] = rtOVArray[0] as number + 1;
+      expect(rtOVArray[1]).to.equal(43);
+      console.log(JSON.stringify(rtOVArray));
+    })
 
-    console.log(JSON.stringify(rtOVArray));
+    it( 'incorrect assignment', () => {
+      assert.throw(() => {
+        //@ts-ignore
+        rtOVArray[0] = {};
+      }, '[{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/0/type",' +
+        '"params":{"type":"string"},"message":"should be string"},' +
+        '{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/1/type","params":{"type":"number"},"message":"should be number"},' +
+        '{"keyword":"oneOf","dataPath":"","schemaPath":"#/oneOf","params":{"passingSchemas":null},' +
+        '"message":"should match exactly one schema in oneOf"}]');
+    });
+  });
 
-    assert.throw(() => {
-      //@ts-ignore
-       rtOVArray[0] = {};
-    }, '[{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/0/type",' +
-      '"params":{"type":"string"},"message":"should be string"},' +
-      '{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/1/type","params":{"type":"number"},"message":"should be number"},' +
-      '{"keyword":"oneOf","dataPath":"","schemaPath":"#/oneOf","params":{"passingSchemas":null},' +
-      '"message":"should match exactly one schema in oneOf"}]');
+  describe('RtOVArray with complex types', () => {
+    const schema = {
+      type: "array",
+      items: [
+        {type: "object"}, //do not need to check here the complex object since it's checked internally by its decorators
+        {type: "number"},
+      ]
+    };
+    const complexObj = new EmbeddedObject<ExampleObjectData>({
+      id: 2,
+      data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
+    }, ExampleObjectData);
+
+    const array = [666, complexObj];
+    const rtOVArray = new RtOVArray<typeof complexObj | number>(array, {className: 'test', schema});
+
+    it('Instancing', () => {
+      expect(rtOVArray.toJSON()).to.deep.equal(array);
+      console.log(JSON.stringify(rtOVArray));
+    })
+
+    it('correct assignment in complex object', () => {
+      (rtOVArray[1] as EmbeddedObject<ExampleObjectData>).data.currency = "USD";
+    });
+
+    it('incorrect assignment in complex object', () => {
+      assert.throw(() =>{
+        (rtOVArray[1] as EmbeddedObject<ExampleObjectData>).data =  {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
+      }, '[{"keyword":"enum","dataPath":".currency",' +
+        '"schemaPath":"#/properties/currency/enum","' +
+        'params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]')
+    });
+
   });
 
 });

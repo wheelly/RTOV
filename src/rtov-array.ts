@@ -1,7 +1,5 @@
-import {MetaData, setValidator} from "./lib";
+import {MetaData, setValidator, SchemaItemType} from "./lib";
 import * as AJV from "ajv";
-
-type ItemType = "number" | "integer" |  "string" | "boolean" | "array" | "object" | "null"
 
 class IndexType<T> {
   [index: number] : T
@@ -24,7 +22,7 @@ export class RtOVArray<T> extends IndexType<T>{
   }
 
   private itemsMetaData()  {
-    const items = (this.metaData.schema as any).items as ItemType[];
+    const items = (this.metaData.schema as any).items as SchemaItemType[];
     if ( ! items || ! items.length ) {
       throw Error("No items for array validation");
     }
