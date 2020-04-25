@@ -27,11 +27,12 @@ describe('RtOVArray basic functionality', () => {
             chai_1.assert.throw(() => {
                 //@ts-ignore
                 rtOVArray[0] = {};
-            }, '[{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/0/type",' +
+            }, '[{"keyword":"type","dataPath":"","schemaPath":"#/anyOf/0/type",' +
                 '"params":{"type":"string"},"message":"should be string"},' +
-                '{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/1/type","params":{"type":"number"},"message":"should be number"},' +
-                '{"keyword":"oneOf","dataPath":"","schemaPath":"#/oneOf","params":{"passingSchemas":null},' +
-                '"message":"should match exactly one schema in oneOf"}]');
+                '{"keyword":"type","dataPath":"","schemaPath":"#/anyOf/1/type",' +
+                '"params":{"type":"number"},"message":"should be number"},' +
+                '{"keyword":"anyOf","dataPath":"",' +
+                '"schemaPath":"#/anyOf","params":{},"message":"should match some schema in anyOf"}]');
         });
     });
     describe('RtOVArray with complex types', () => {
@@ -45,7 +46,7 @@ describe('RtOVArray basic functionality', () => {
         const complexObj = new data_1.EmbeddedObject({
             id: 2,
             data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
-        }, data_1.ExampleObjectData);
+        }, data_1.ObjectData);
         const array = [666, complexObj];
         const rtOVArray = new rtov_array_1.RtOVArray(array, { className: 'test', schema });
         it('Instancing', () => {

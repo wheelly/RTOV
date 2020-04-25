@@ -4,6 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./EmbeddedObject"));
-__export(require("./ExampleObjectData"));
+__export(require("./ObjectData"));
 __export(require("./EmbeddedSimpleArray"));
+__export(require("./EmbdeddedComplexArray"));
 //# sourceMappingURL=index.js.map

@@ -7,7 +7,7 @@ describe('EmbeddedObject Valid Data', function () {
         const user = new data_1.EmbeddedObject({
             id: 2,
             data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
-        }, data_1.ExampleObjectData);
+        }, data_1.ObjectData);
         const currency = "USD";
         const newData = { currency, name: "Imgo", surname: "Burner" };
         user.data = newData;
@@ -17,7 +17,7 @@ describe('EmbeddedObject Valid Data', function () {
         const user = new data_1.EmbeddedObject({
             id: 2,
             data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
-        }, data_1.ExampleObjectData);
+        }, data_1.ObjectData);
         user.data.currency = "USD";
         chai_1.expect(user.data.currency).to.equal("USD");
     });

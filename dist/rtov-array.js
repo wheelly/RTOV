@@ -21,10 +21,24 @@ class RtOVArray extends IndexType {
     }
     itemsMetaData() {
         const items = this.metaData.schema.items;
-        if (!items || !items.length) {
+        if (!items || !Object.keys(items).length) {
             throw Error("No items for array validation");
         }
-        return { className: this.metaData.className + ':' + this.constructor.name, schema: { oneOf: items } };
+        //this is ajv type checking for each property of the array - should satisfy any of because it one item
+        const propertyPossibleTypes = (() => {
+            //TODO: if all of we must re-invoke somehow validation of the whole array from the main object again
+            for (const unionType of ["allOf", "anyOf", "oneOf"]) {
+                const unionTypeValue = items[unionType];
+                if (unionTypeValue) {
+                    if (!Array.isArray(unionTypeValue)) {
+                        throw new Error(`Array expected. Got ${unionTypeValue}`);
+                    }
+                    return unionTypeValue;
+                }
+            }
+            return items;
+        })();
+        return { className: this.metaData.className + ':' + this.constructor.name, schema: { anyOf: propertyPossibleTypes } };
     }
     addProperty(name, value) {
         Object.defineProperty(this, name, {
