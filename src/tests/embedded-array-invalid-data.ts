@@ -1,9 +1,10 @@
-import {EmbeddedSimpleArray} from "./data";
+import {EmbeddedSimpleArray, EmbeddedComplexArray, EmbeddedObject, ObjectData} from "./data";
+import {getSchema} from "../decorators";
 import {assert} from 'chai';
 
-describe('EmbeddedSimpleArray Invalid Data', function() {
+describe('EmbeddedArray Invalid Data', function () {
 
-  describe('Property Instancing Validation', function() {
+  describe('Simple Array: Property Instancing Validation', function () {
     it('validate prop creation - incorrect array length', function () {
       assert.throw(() => {
         new EmbeddedSimpleArray({
@@ -14,20 +15,45 @@ describe('EmbeddedSimpleArray Invalid Data', function() {
     });
   });
 
-  // describe('Property Access Validation', function() {
-  //   it('validate assignment in array', function () {
-  //     assert.throw(() => {
-  //       const obj = new EmbeddedSimpleArray({
-  //         id: 2,
-  //         data: ["zack"]
-  //       });
-  //       console.log(JSON.stringify(getSchema(obj)));
-  //       console.log(JSON.stringify(obj));
-  //       //@ts-ignore
-  //       obj.data[0] = 1;
-  //     }, '[{"keyword":"minItems","dataPath":"","schemaPath":"#/minItems","params":{"limit":1},"message":"should NOT have fewer than 1 items"}]');
-  //   });
-  // });
+  describe('Simple Array: Property Access Validation', function () {
+    it('validate assignment in simple array', function () {
+      assert.throw(() => {
+        const obj = new EmbeddedSimpleArray({
+          id: 2,
+          data: ["zack"]
+        });
+        console.log(JSON.stringify(getSchema(obj)));
+        console.log(JSON.stringify(obj));
+        //@ts-ignore
+        obj.data[0] = 1;
+      }, '[{"keyword":"type","dataPath":"","schemaPath":"#/anyOf/0/type",' +
+        '"params":{"type":"string"},"message":"should be string"},' +
+        '{"keyword":"anyOf","dataPath":"","schemaPath":"#/anyOf",' +
+        '"params":{},"message":"should match some schema in anyOf"}]');
+    });
+  });
+
+  describe('Complex Array: Property Access Validation', function () {
+    it('validate assignment in array', function () {
+      assert.throw(() => {
+        const obj = new EmbeddedComplexArray({
+          id: 2,
+          data: [
+            "zack",
+            666,
+            new EmbeddedObject<ObjectData>({
+              id: 2,
+              data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
+            }, ObjectData)
+          ]
+        });
+        console.log(JSON.stringify(getSchema(obj)));
+        console.log(JSON.stringify(obj));
+        (obj.data[2] as EmbeddedObject<ObjectData>).data.currency = "ANY"
+      }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum",' +
+        '"params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]');
+    });
+  });
 
 
 });

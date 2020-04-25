@@ -1,4 +1,4 @@
-import {MetaData, setValidator, SchemaItemType} from "./lib";
+import {MetaData, setValidator, SchemaUnionType, SchemaOfArray} from "./lib";
 import * as AJV from "ajv";
 
 class IndexType<T> {
@@ -22,11 +22,25 @@ export class RtOVArray<T> extends IndexType<T>{
   }
 
   private itemsMetaData()  {
-    const items = (this.metaData.schema as any).items as SchemaItemType[];
-    if ( ! items || ! items.length ) {
+    const items = (this.metaData.schema as SchemaOfArray).items;
+    if ( ! items || ! Object.keys(items).length ) {
       throw Error("No items for array validation");
     }
-    return { className: this.metaData.className + ':' + this.constructor.name, schema: { oneOf: items }}
+    //this is ajv type checking for each property of the array - should satisfy any of because it one item
+    const propertyPossibleTypes = (() => {
+      //TODO: if all of we must re-invoke somehow validation of the whole array from the main object again
+      for ( const unionType  of [ "allOf", "anyOf", "oneOf" ] ) {
+        const unionTypeValue = ( items as SchemaUnionType)[unionType as "allOf" | "anyOf" | "oneOf"]
+        if ( unionTypeValue ) {
+          if (! Array.isArray(unionTypeValue) ) {
+            throw new Error(`Array expected. Got ${unionTypeValue}`);
+          }
+          return unionTypeValue;
+        }
+      }
+      return items;
+    })()
+    return { className: this.metaData.className + ':' + this.constructor.name, schema: { anyOf: propertyPossibleTypes } }
   }
 
   private addProperty(name: string, value: any) {

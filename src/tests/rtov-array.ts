@@ -1,6 +1,6 @@
 import {RtOVArray } from "../rtov-array";
 import {assert, expect} from 'chai';
-import {EmbeddedObject, ExampleObjectData} from "./data";
+import {EmbeddedObject, ObjectData} from "./data";
 
 describe('RtOVArray basic functionality', () => {
 
@@ -32,11 +32,12 @@ describe('RtOVArray basic functionality', () => {
       assert.throw(() => {
         //@ts-ignore
         rtOVArray[0] = {};
-      }, '[{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/0/type",' +
+      }, '[{"keyword":"type","dataPath":"","schemaPath":"#/anyOf/0/type",' +
         '"params":{"type":"string"},"message":"should be string"},' +
-        '{"keyword":"type","dataPath":"","schemaPath":"#/oneOf/1/type","params":{"type":"number"},"message":"should be number"},' +
-        '{"keyword":"oneOf","dataPath":"","schemaPath":"#/oneOf","params":{"passingSchemas":null},' +
-        '"message":"should match exactly one schema in oneOf"}]');
+        '{"keyword":"type","dataPath":"","schemaPath":"#/anyOf/1/type",' +
+        '"params":{"type":"number"},"message":"should be number"},' +
+        '{"keyword":"anyOf","dataPath":"",' +
+        '"schemaPath":"#/anyOf","params":{},"message":"should match some schema in anyOf"}]');
     });
   });
 
@@ -48,10 +49,10 @@ describe('RtOVArray basic functionality', () => {
         {type: "number"},
       ]
     };
-    const complexObj = new EmbeddedObject<ExampleObjectData>({
+    const complexObj = new EmbeddedObject<ObjectData>({
       id: 2,
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-    }, ExampleObjectData);
+    }, ObjectData);
 
     const array = [666, complexObj];
     const rtOVArray = new RtOVArray<typeof complexObj | number>(array, {className: 'test', schema});
@@ -62,12 +63,12 @@ describe('RtOVArray basic functionality', () => {
     })
 
     it('correct assignment in complex object', () => {
-      (rtOVArray[1] as EmbeddedObject<ExampleObjectData>).data.currency = "USD";
+      (rtOVArray[1] as EmbeddedObject<ObjectData>).data.currency = "USD";
     });
 
     it('incorrect assignment in complex object', () => {
       assert.throw(() =>{
-        (rtOVArray[1] as EmbeddedObject<ExampleObjectData>).data =  {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
+        (rtOVArray[1] as EmbeddedObject<ObjectData>).data =  {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
       }, '[{"keyword":"enum","dataPath":".currency",' +
         '"schemaPath":"#/properties/currency/enum","' +
         'params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]')

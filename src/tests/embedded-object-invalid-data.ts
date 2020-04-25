@@ -1,4 +1,4 @@
-import {EmbeddedObject, ExampleObjectData} from "./data";
+import {EmbeddedObject, ObjectData} from "./data";
 import {assert} from 'chai';
 import { getSchema } from "../RTOV";
 
@@ -7,19 +7,19 @@ describe('EmbeddedObject Invalid Data', function() {
   describe('Property Instancing Validation', function() {
     it('validate prop creation - incorrect currency', function() {
       assert.throw(() => {
-        new EmbeddedObject<ExampleObjectData>({
+        new EmbeddedObject<ObjectData>({
           id: 2,
           data: {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleObjectData);
+        }, ObjectData);
       }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum","params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]');
     });
 
     it('validate embedded prop access', function() {
       assert.throw(() => {
-        const user = new EmbeddedObject<ExampleObjectData>({
+        new EmbeddedObject<ObjectData>({
           id: 0,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleObjectData);
+        }, ObjectData);
       }, '[{"keyword":"minimum","dataPath":"","schemaPath":"#/minimum","params":{"comparison":">=","limit":1,"exclusive":false},"message":"should be >= 1"}]');
     });
   });
@@ -27,10 +27,10 @@ describe('EmbeddedObject Invalid Data', function() {
   describe('Property Access Validation', function() {
     it('validate prop access', function() {
       assert.throw(() => {
-        let user = new EmbeddedObject<ExampleObjectData>({
+        let user = new EmbeddedObject<ObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleObjectData);
+        }, ObjectData);
 
         console.log(JSON.stringify(user));
         console.log( JSON.stringify(getSchema(user)) );
@@ -40,18 +40,18 @@ describe('EmbeddedObject Invalid Data', function() {
 
     it('validate embedded prop access', function() {
       assert.throw(() => {
-        let user = new EmbeddedObject<ExampleObjectData>({
+        let user = new EmbeddedObject<ObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleObjectData);
+        }, ObjectData);
         user.data.currency = "ANY"
       });
 
       assert.throw(() => {
-        let user = new EmbeddedObject<ExampleObjectData>({
+        let user = new EmbeddedObject<ObjectData>({
           id: 2,
           data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-        }, ExampleObjectData);
+        }, ObjectData);
 
         //@ts-ignore
         user.data = { currency: "ANY" }

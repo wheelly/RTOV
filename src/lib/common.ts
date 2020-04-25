@@ -6,9 +6,13 @@ export interface MetaData {
   schema: Object;
 }
 
+export type SchemaUnionType = {
+  [union in "oneOf" | "anyOf" | "allOf"]: any[];
+};
+
 export interface SchemaOfArray {
   type: 'array';
-  items: {type: SchemaItemType}[]
+  items: {type: SchemaItemType}[] | SchemaUnionType
 }
 
 

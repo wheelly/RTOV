@@ -1,13 +1,13 @@
 import {expect} from 'chai';
-import { CurrencyType, EmbeddedObject, ExampleObjectData } from "./data";
+import { CurrencyType, EmbeddedObject, ObjectData } from "./data";
 
 describe('EmbeddedObject Valid Data', function () {
 
   it('Validate correct data assignment in embedded object', function () {
-    const user = new EmbeddedObject<ExampleObjectData>({
+    const user = new EmbeddedObject<ObjectData>({
       id: 2,
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-    }, ExampleObjectData);
+    }, ObjectData);
 
     const currency : CurrencyType = "USD";
     const newData = {currency, name: "Imgo", surname: "Burner"}
@@ -16,10 +16,10 @@ describe('EmbeddedObject Valid Data', function () {
   });
 
   it('Validate correct data assignment in embedded object  property', function () {
-    const user = new EmbeddedObject<ExampleObjectData>({
+    const user = new EmbeddedObject<ObjectData>({
       id: 2,
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-    }, ExampleObjectData);
+    }, ObjectData);
 
     user.data.currency = "USD";
     expect(user.data.currency).to.equal("USD");

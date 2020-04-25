@@ -1,3 +1,4 @@
 export * from "./EmbeddedObject";
-export * from './ExampleObjectData';
+export * from './ObjectData';
 export * from './EmbeddedSimpleArray';
+export * from './EmbdeddedComplexArray';
