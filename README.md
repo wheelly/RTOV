@@ -145,7 +145,7 @@ yarn tests
 ## TODO
 
 * Custom validators support
-* Array support - not tested yet so might be not working
+* Array - re-validation of array when one of its items being assigned in case of allOf and oneOf
 
 ## Bugs
 
