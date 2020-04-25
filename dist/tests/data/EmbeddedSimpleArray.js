@@ -10,12 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
-let ExampleUser = class ExampleUser {
-    constructor(args, embeddedConstructor) {
+let EmbeddedSimpleArray = class EmbeddedSimpleArray {
+    constructor(args) {
         this.id = 0;
-        this.organization = "";
         // mandatory here to validate embedded data
-        this.data = new embeddedConstructor(args.data);
+        this.data = args.data;
     }
 };
 __decorate([
@@ -23,16 +22,22 @@ __decorate([
         type: "number", minimum: 1
     }),
     __metadata("design:type", Number)
-], ExampleUser.prototype, "id", void 0);
+], EmbeddedSimpleArray.prototype, "id", void 0);
 __decorate([
     RTOV_1.property({
-        type: "object",
+        type: "array",
+        items: [
+            { type: "string" }
+        ],
+        uniqueItems: true,
+        minItems: 1,
+        maxItems: 3
     }),
-    __metadata("design:type", Object)
-], ExampleUser.prototype, "data", void 0);
-ExampleUser = __decorate([
+    __metadata("design:type", Array)
+], EmbeddedSimpleArray.prototype, "data", void 0);
+EmbeddedSimpleArray = __decorate([
     RTOV_1.validate,
-    __metadata("design:paramtypes", [Object, Object])
-], ExampleUser);
-exports.ExampleUser = ExampleUser;
-//# sourceMappingURL=ExampleUser.js.map
+    __metadata("design:paramtypes", [EmbeddedSimpleArray])
+], EmbeddedSimpleArray);
+exports.EmbeddedSimpleArray = EmbeddedSimpleArray;
+//# sourceMappingURL=EmbeddedSimpleArray.js.map

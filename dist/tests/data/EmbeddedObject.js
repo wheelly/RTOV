@@ -10,30 +10,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
-let ExampleUserData = class ExampleUserData {
-    constructor() {
-        this.currency = "ILS";
-        this.name = "";
-        this.surname = "";
+let EmbeddedObject = class EmbeddedObject {
+    constructor(args, embeddedConstructor) {
+        this.id = 0;
+        this.organization = "";
+        // mandatory here to validate embedded data
+        this.data = new embeddedConstructor(args.data);
     }
 };
 __decorate([
     RTOV_1.property({
-        type: "string",
-        enum: ["ILS", "EUR", "USD"]
+        type: "number", minimum: 1
     }),
-    __metadata("design:type", String)
-], ExampleUserData.prototype, "currency", void 0);
+    __metadata("design:type", Number)
+], EmbeddedObject.prototype, "id", void 0);
 __decorate([
-    RTOV_1.property({ type: "string" }),
-    __metadata("design:type", String)
-], ExampleUserData.prototype, "name", void 0);
-__decorate([
-    RTOV_1.property({ type: "string" }),
-    __metadata("design:type", String)
-], ExampleUserData.prototype, "surname", void 0);
-ExampleUserData = __decorate([
-    RTOV_1.validate
-], ExampleUserData);
-exports.ExampleUserData = ExampleUserData;
-//# sourceMappingURL=ExampleUserData.js.map
+    RTOV_1.property({
+        type: "object",
+    }),
+    __metadata("design:type", Object)
+], EmbeddedObject.prototype, "data", void 0);
+EmbeddedObject = __decorate([
+    RTOV_1.validate,
+    __metadata("design:paramtypes", [Object, Object])
+], EmbeddedObject);
+exports.EmbeddedObject = EmbeddedObject;
+//# sourceMappingURL=EmbeddedObject.js.map

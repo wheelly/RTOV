@@ -1,2 +1,2 @@
-export * from "./lib";
 export * from "./decorators";
+export * from "./rtov-array";
