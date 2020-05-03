@@ -47,7 +47,7 @@ describe('EmbeddedArray Invalid Data', function () {
                 });
                 console.log(JSON.stringify(decorators_1.getSchema(obj)));
                 console.log(JSON.stringify(obj));
-                obj.data[2].data.currency = "USD";
+                obj.data[2].data.currency = "ANY";
             }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum",' +
                 '"params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]');
         });

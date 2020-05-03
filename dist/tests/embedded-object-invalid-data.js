@@ -15,7 +15,7 @@ describe('EmbeddedObject Invalid Data', function () {
         });
         it('validate embedded prop access', function () {
             chai_1.assert.throw(() => {
-                const user = new data_1.EmbeddedObject({
+                new data_1.EmbeddedObject({
                     id: 0,
                     data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
                 }, data_1.ObjectData);
