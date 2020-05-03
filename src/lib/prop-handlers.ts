@@ -8,7 +8,7 @@ export const getPropName = (name: string) => PROP_PREFIX + name;
 
 export const setReadOnlyProperty = (obj: any, prop: string, data: any) => {
   Object.defineProperty(obj, getPropName(prop), {
-    value: data,
+    value: data || obj[prop], //default value
     writable: false,
     configurable: true //let it be redefined
   });
