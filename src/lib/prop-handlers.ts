@@ -16,10 +16,10 @@ export const setReadOnlyProperty = (obj: any, prop: string, data: any) => {
 
 export const setPropertyRecursive = (obj: any, prop: string, data: any) => {
   if (isComplexType(obj[prop]) && ! Array.isArray(obj[prop])) {
-    Object.assign(obj[prop], data); //initialization!!!!
     for (const subProp of getPublicProperties(obj[prop])) {
       setPropertyRecursive(obj[prop], subProp, data[subProp]);
     }
+    Object.assign(obj[prop], data); //initialization!!!!
     setReadOnlyProperty(obj, prop, obj[prop]);
   } else {
     setReadOnlyProperty(obj, prop, data);
