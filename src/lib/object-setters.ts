@@ -29,7 +29,7 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
   const propValidator = (data: any) => {
     const validate = ajv.getSchema(schemaId);
     if (validate && !validate(data)) {
-      throw new Error(JSON.stringify(validate.errors));
+      throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
     }
 
     const schemaOfArray = schema as SchemaOfArray;
@@ -42,7 +42,8 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
     }
   };
 
-  propValidator(newValue); //validate on construction
+  //default values from constructor processed here
+  propValidator(newValue === undefined ? obj[prop] : newValue); //validate on construction
   obj.__defineSetter__(prop, propValidator);
   obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
   return schemaProperties;

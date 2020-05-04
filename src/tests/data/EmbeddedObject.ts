@@ -14,7 +14,10 @@ export class EmbeddedObject<T extends {}> {
   @property({
     type: "object",
   })
-  data : T;
+  data : Partial<T>;
+
+  @property({type: "boolean"})
+  booleanFieldDefault: boolean = false
 
   constructor(args : Partial<EmbeddedObject<T>>, embeddedConstructor: ModelConstructor<T>) {
     // mandatory here to validate embedded data

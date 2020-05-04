@@ -12,6 +12,7 @@ describe('EmbeddedObject Valid Data', function () {
     const currency : CurrencyType = "USD";
     const newData = {currency, name: "Imgo", surname: "Burner"}
     user.data = newData;
+    expect(user.booleanFieldDefault).to.equal(false);
     expect(user.data).to.deep.equal(newData);
   });
 
