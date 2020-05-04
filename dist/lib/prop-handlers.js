@@ -6,7 +6,7 @@ exports.getPublicProperties = (obj) => Object.getOwnPropertyNames(obj).filter((p
 exports.getPropName = (name) => PROP_PREFIX + name;
 exports.setReadOnlyProperty = (obj, prop, data) => {
     Object.defineProperty(obj, exports.getPropName(prop), {
-        value: data || obj[prop],
+        value: data,
         writable: false,
         configurable: true //let it be redefined
     });

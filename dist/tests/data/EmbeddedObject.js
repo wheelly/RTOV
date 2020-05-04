@@ -14,6 +14,7 @@ let EmbeddedObject = class EmbeddedObject {
     constructor(args, embeddedConstructor) {
         this.id = 0;
         this.organization = "";
+        this.booleanFieldDefault = false;
         // mandatory here to validate embedded data
         this.data = new embeddedConstructor(args.data);
     }
@@ -30,6 +31,10 @@ __decorate([
     }),
     __metadata("design:type", Object)
 ], EmbeddedObject.prototype, "data", void 0);
+__decorate([
+    RTOV_1.property({ type: "boolean" }),
+    __metadata("design:type", Boolean)
+], EmbeddedObject.prototype, "booleanFieldDefault", void 0);
 EmbeddedObject = __decorate([
     RTOV_1.validate,
     __metadata("design:paramtypes", [Object, Object])

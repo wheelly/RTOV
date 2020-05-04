@@ -19,7 +19,7 @@ describe('EmbeddedObject Invalid Data', function () {
                     id: 0,
                     data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
                 }, data_1.ObjectData);
-            }, '[{"keyword":"minimum","dataPath":"","schemaPath":"#/minimum","params":{"comparison":">=","limit":1,"exclusive":false},"message":"should be >= 1"}]');
+            }, '[id]=[{"keyword":"minimum","dataPath":"","schemaPath":"#/minimum","params":{"comparison":">=","limit":1,"exclusive":false},"message":"should be >= 1"}]');
         });
     });
     describe('Property Access Validation', function () {

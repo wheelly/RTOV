@@ -11,6 +11,7 @@ describe('EmbeddedObject Valid Data', function () {
         const currency = "USD";
         const newData = { currency, name: "Imgo", surname: "Burner" };
         user.data = newData;
+        chai_1.expect(user.booleanFieldDefault).to.equal(false);
         chai_1.expect(user.data).to.deep.equal(newData);
     });
     it('Validate correct data assignment in embedded object  property', function () {

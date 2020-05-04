@@ -18,7 +18,7 @@ exports.setValidator = (ajv, metaData, obj, newValue, prop) => {
     const propValidator = (data) => {
         const validate = ajv.getSchema(schemaId);
         if (validate && !validate(data)) {
-            throw new Error(JSON.stringify(validate.errors));
+            throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
         }
         const schemaOfArray = schema;
         if (Array.isArray(obj[prop]) && schemaOfArray.type && schemaOfArray.type === 'array') {
@@ -29,7 +29,8 @@ exports.setValidator = (ajv, metaData, obj, newValue, prop) => {
             _1.setPropertyRecursive(obj, prop, data);
         }
     };
-    propValidator(newValue); //validate on construction
+    //default values from constructor processed here
+    propValidator(newValue === undefined ? obj[prop] : newValue); //validate on construction
     obj.__defineSetter__(prop, propValidator);
     obj.__defineGetter__(prop, () => obj[_1.getPropName(prop)]);
     return schemaProperties;
