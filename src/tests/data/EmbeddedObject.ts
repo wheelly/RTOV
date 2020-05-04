@@ -1,6 +1,8 @@
 import {validate, property} from "../../RTOV";
 import { ModelConstructor } from "./common";
 
+type RuntimeDefinitionsMap<T> =  { [resolverName: string] : T}
+
 @validate
 export class EmbeddedObject<T extends {}> {
 
@@ -18,6 +20,9 @@ export class EmbeddedObject<T extends {}> {
 
   @property({type: "boolean"})
   booleanFieldDefault: boolean = false
+
+  @property({type: "object"})
+  definitions : RuntimeDefinitionsMap<number> = {};
 
   constructor(args : Partial<EmbeddedObject<T>>, embeddedConstructor: ModelConstructor<T>) {
     // mandatory here to validate embedded data

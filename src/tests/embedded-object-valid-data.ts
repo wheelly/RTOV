@@ -6,12 +6,15 @@ describe('EmbeddedObject Valid Data', function () {
   it('Validate correct data assignment in embedded object', function () {
     const user = new EmbeddedObject<ObjectData>({
       id: 2,
+      definitions: { def: 1 },
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
     }, ObjectData);
 
     const currency : CurrencyType = "USD";
     const newData = {currency, name: "Imgo", surname: "Burner"}
     user.data = newData;
+    console.log(JSON.stringify(user));
+    expect(user.definitions).to.deep.equal({def: 1})
     expect(user.booleanFieldDefault).to.equal(false);
     expect(user.data).to.deep.equal(newData);
   });
