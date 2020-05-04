@@ -16,4 +16,4 @@ export interface SchemaOfArray {
 }
 
 
-export const isComplexType = (data: any) => typeof data === 'object';
+export const isComplexType = (data: any) => data !== null && typeof data === 'object';
