@@ -13,6 +13,7 @@ exports.setReadOnlyProperty = (obj, prop, data) => {
 };
 exports.setPropertyRecursive = (obj, prop, data) => {
     if (index_1.isComplexType(obj[prop]) && !Array.isArray(obj[prop])) {
+        Object.assign(obj[prop], data); //initialization!!!!
         for (const subProp of exports.getPublicProperties(obj[prop])) {
             exports.setPropertyRecursive(obj[prop], subProp, data[subProp]);
         }
