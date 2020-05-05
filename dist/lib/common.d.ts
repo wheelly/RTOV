@@ -12,4 +12,4 @@ export interface SchemaOfArray {
         type: SchemaItemType;
     }[] | SchemaUnionType;
 }
-export declare const isComplexType: (data: any) => boolean;
+export declare const isComplexType: (value: any) => boolean;
