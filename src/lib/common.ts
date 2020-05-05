@@ -15,5 +15,12 @@ export interface SchemaOfArray {
   items: {type: SchemaItemType}[] | SchemaUnionType
 }
 
-
-export const isComplexType = (data: any) => data !== null && typeof data === 'object';
+export const isComplexType = (value: any) => {
+  return typeof value === "object"
+    && value !== null
+    && !(value instanceof Boolean)
+    && !(value instanceof Date)
+    && !(value instanceof Number)
+    && !(value instanceof RegExp)
+    && !(value instanceof String)
+}
