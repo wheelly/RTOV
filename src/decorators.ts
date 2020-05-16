@@ -15,12 +15,32 @@ export const getSchema = (object: Object): Object | void => {
 export function validate<T extends { new(...constructorArgs: any[]): any }>(constructorFunction: T) {
 
   //new constructor function
-  let newConstructorFunction: any = function (args: T, extra?: any[]) {
+  let newConstructorFunction: any = function (args: T, embeddedConstructor?: any[]) {
     //overriding constructor - setters instead of properties
     let schema = {};
     let func: any = function () {
-      let obj = new constructorFunction(args, extra);
+      /*
+        pseudo constructor, creates object without initializing the properties from args
+        embeddedConstructor allows for calling constructor of embedded class to validate it through the parent
+        provided embedded has @validate decorator above it
+        Example:
+
+        @validate
+        export class EmbeddedObject<T extends {}> {
+          @property({
+            type: "object",
+          })
+          data : Partial<T>;
+          constructor(args : Partial<EmbeddedObject<T>>, embeddedConstructor: ModelConstructor<T>) {
+            // mandatory here to validate embedded data
+            this.data = new embeddedConstructor(args.data); //this will be validated as well
+          }
+        }
+      TODO: find a way to validate embedded class objects automatically
+      */
+      let obj = new constructorFunction(args, embeddedConstructor);
       const ajv: AJV.Ajv = new AJV({allErrors: true});
+      //that's why we need to put here args again
       const properties = addObjectSetters(ajv, obj, args);
       schema = {type: "object", required: Object.keys(properties), properties};
       return obj;
