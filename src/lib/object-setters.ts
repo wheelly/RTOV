@@ -1,23 +1,21 @@
 import * as AJV from "ajv";
 import {
   getPropName,
-  setPropertyRecursive,
-  isComplexType,
   getPublicProperties,
   debug,
   MetaData,
   SchemaOfArray, setReadOnlyProperty,
 } from "./";
 
-import { RtOVArray } from "../RTOV";
+import { RtOVArray, getSchema } from "../RTOV";
 
 export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValue: any, prop: string) => {
   let schemaProperties : any = {}
-  const {className, schema} = metaData;
+  const {className, schema, objectConstructor} = metaData;
 
-  if (isComplexType(obj[prop]) && ! Array.isArray(obj[prop])) {
-    const embeddedProperties = addObjectSetters(ajv, obj[prop], newValue);
-    schemaProperties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
+  if (objectConstructor) {
+    obj[prop] = new objectConstructor(newValue);
+    schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
   } else {
     schemaProperties[prop] = schema;
   }
@@ -27,6 +25,7 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
   ajv.addSchema({"$id": schemaId, ...schemaProperties[prop]});
 
   const propValidator = (data: any) => {
+
     const validate = ajv.getSchema(schemaId);
     if (validate && !validate(data)) {
       throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
@@ -34,11 +33,14 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
 
     const schemaOfArray = schema as SchemaOfArray;
 
-    if ( Array.isArray(obj[prop]) && schemaOfArray.type && schemaOfArray.type === 'array') {
+    if ( Array.isArray(obj[prop])) {
       debug(() => 'Array with type array in schema converting to RtOVArray');
+      if ( schemaOfArray.type && schemaOfArray.type !== 'array' ) {
+        throw new Error('Incorrect schema type -> must be "array"');
+      }
       setReadOnlyProperty(obj, prop, new RtOVArray<any>(data, metaData, ajv));
     } else {
-      setPropertyRecursive(obj, prop, data);
+      setReadOnlyProperty(obj, prop, obj[prop]);
     }
   };
 
@@ -62,10 +64,9 @@ export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
   for (const prop of getPublicProperties(obj)) {
     const metaData = getMetadata(obj, prop);
     if (metaData) {
-      schemaProperties = Object.assign(schemaProperties, setValidator(ajv, metaData, obj, args[prop], prop));
+      schemaProperties = { ...schemaProperties, ...setValidator(ajv, metaData, obj, args[prop], prop) };
     }
   }
-
   return schemaProperties;
 
 };

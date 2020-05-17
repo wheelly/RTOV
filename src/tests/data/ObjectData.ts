@@ -18,4 +18,6 @@ export class ObjectData {
 
   description?: any;
 
+  constructor(args : ObjectData) {}
+
 }

@@ -25,7 +25,7 @@ export class EmbeddedComplexArray {
     minItems: 1,
     maxItems: 3
   })
-  data : (string | number | EmbeddedObject<ObjectData>)[]
+  data : (string | number | EmbeddedObject)[]
 
   constructor(args : EmbeddedComplexArray) {
     // mandatory here to validate embedded data
