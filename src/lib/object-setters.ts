@@ -7,14 +7,24 @@ import {
   SchemaOfArray, setReadOnlyProperty,
 } from "./";
 
-import { RtOVArray, getSchema } from "../RTOV";
+import {RtOVArray, getSchema, RTOVConstructor} from "../RTOV";
 
-export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, data: any, prop: string) => {
-  let schemaProperties : any = {}
+export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], metaData: MetaData, obj: any, data: any, prop: string) => {
+  let schemaProperties: any = {}
   const {className, schema, objectConstructor} = metaData;
 
   if (objectConstructor) {
-    obj[prop] = new objectConstructor(data);
+
+    if (objectConstructor === "extern") {
+      if ( externalCtors.length === 0) {
+        throw new Error('No external constructor passed as argument to your class constructor');
+      }
+      const externalCtor = externalCtors.shift() as RTOVConstructor;
+      obj[prop] = new externalCtor(data);
+    } else {
+      //this is the call to embedded class constructor
+      obj[prop] = new objectConstructor(data);
+    }
     schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
   } else {
     schemaProperties[prop] = schema;
@@ -33,9 +43,9 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, data: a
 
     const schemaOfArray = schema as SchemaOfArray;
 
-    if ( Array.isArray(obj[prop])) {
+    if (Array.isArray(obj[prop])) {
       debug(() => 'Array with type array in schema converting to RtOVArray');
-      if ( schemaOfArray.type && schemaOfArray.type !== 'array' ) {
+      if (schemaOfArray.type && schemaOfArray.type !== 'array') {
         throw new Error('Incorrect schema type -> must be "array"');
       }
       setReadOnlyProperty(obj, prop, new RtOVArray<any>(data, metaData, ajv));
@@ -50,7 +60,7 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, data: a
     2. Otherwise data (args) if any or default value from obj[prop]
     *** Default values are constructed in decorator.ts -> let obj = new constructorFunction();
    */
-  const getData = () : any => objectConstructor ? obj[prop] : data || obj[prop];
+  const getData = (): any => objectConstructor ? obj[prop] : data || obj[prop];
 
   //when instancing we need to call here propValidator (then it will be called on assignment as a setter)
   propValidator(getData()); //validate on construction
@@ -60,7 +70,7 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, data: a
 }
 
 
-export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
+export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], obj: any, args: any) => {
 
   const getMetadata = (obj: any, prop: string) => {
     const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
@@ -72,7 +82,7 @@ export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
   for (const prop of getPublicProperties(obj)) {
     const metaData = getMetadata(obj, prop);
     if (metaData) {
-      schemaProperties = { ...schemaProperties, ...setValidator(ajv, metaData, obj, args[prop], prop) };
+      schemaProperties = {...schemaProperties, ...setValidator(ajv, externalCtors, metaData, obj, args[prop], prop)};
     }
   }
   return schemaProperties;

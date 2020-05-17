@@ -1,13 +1,11 @@
-export type SchemaItemType = "number" | "integer" |  "string" | "boolean" | "array" | "object" | "null"
+import {RTOVConstructor} from "../constructor";
 
-export interface ObjectConstructor {
-  new(...args: any[]): any;
-}
+export type SchemaItemType = "number" | "integer" |  "string" | "boolean" | "array" | "object" | "null"
 
 export interface MetaData {
   className: string;
   schema: Object;
-  objectConstructor?: ObjectConstructor;
+  objectConstructor?: RTOVConstructor | "extern";
 }
 
 export type SchemaUnionType = {
