@@ -9,12 +9,12 @@ import {
 
 import { RtOVArray, getSchema } from "../RTOV";
 
-export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValue: any, prop: string) => {
+export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, data: any, prop: string) => {
   let schemaProperties : any = {}
   const {className, schema, objectConstructor} = metaData;
 
   if (objectConstructor) {
-    obj[prop] = new objectConstructor(newValue);
+    obj[prop] = new objectConstructor(data);
     schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
   } else {
     schemaProperties[prop] = schema;
@@ -40,12 +40,20 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
       }
       setReadOnlyProperty(obj, prop, new RtOVArray<any>(data, metaData, ajv));
     } else {
-      setReadOnlyProperty(obj, prop, obj[prop]);
+
+      setReadOnlyProperty(obj, prop, data);
     }
   };
 
-  //default values from constructor processed here
-  propValidator(newValue === undefined ? obj[prop] : newValue); //validate on construction
+  /*
+    1. Instance property if we have a objectConstructor
+    2. Otherwise data (args) if any or default value from obj[prop]
+    *** Default values are constructed in decorator.ts -> let obj = new constructorFunction();
+   */
+  const getData = () : any => objectConstructor ? obj[prop] : data || obj[prop];
+
+  //when instancing we need to call here propValidator (then it will be called on assignment as a setter)
+  propValidator(getData()); //validate on construction
   obj.__defineSetter__(prop, propValidator);
   obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
   return schemaProperties;
