@@ -1,11 +1,11 @@
-import {RTOVConstructor} from "../constructor";
+import {RTOVConstructor, ExternCtorPosition} from "../constructor";
 
 export type SchemaItemType = "number" | "integer" |  "string" | "boolean" | "array" | "object" | "null"
 
 export interface MetaData {
   className: string;
   schema: Object;
-  objectConstructor?: RTOVConstructor | "extern";
+  objectConstructor?: RTOVConstructor | ExternCtorPosition;
 }
 
 export type SchemaUnionType = {

@@ -14,7 +14,7 @@ export class GenericEmbeddedObject<T> {
 
   @property({
     type: "object",
-  }, "extern")
+  }, { extern: 1 })
   data : Partial<T> = {};
 
   @property({type: "boolean"})

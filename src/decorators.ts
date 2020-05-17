@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import * as AJV from "ajv";
 import {setReadOnlyProperty, addObjectSetters, debug} from "./lib";
-import {RTOVConstructor} from "./constructor";
+import {RTOVConstructor, ExternCtorPosition} from "./constructor";
 
 
 /*
@@ -46,7 +46,7 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
 /*
     This is property of object to be validated
  */
-export function property(schema: Object, objectConstructor?: RTOVConstructor | "extern") {
+export function property(schema: Object, objectConstructor?: RTOVConstructor | ExternCtorPosition) {
   return function addValidationRule(target: any, propertyKey: string) {
     const className = target.constructor.name;
     debug(() => `@property -> ${className}.${propertyKey} schema: ${JSON.stringify(schema)}`);

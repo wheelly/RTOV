@@ -7,7 +7,7 @@ import {
   SchemaOfArray, setReadOnlyProperty,
 } from "./";
 
-import {RtOVArray, getSchema, RTOVConstructor} from "../RTOV";
+import {RtOVArray, getSchema, RTOVConstructor, ExternCtorPosition} from "../RTOV";
 
 export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], metaData: MetaData, obj: any, data: any, prop: string) => {
   let schemaProperties: any = {}
@@ -15,15 +15,17 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
 
   if (objectConstructor) {
 
-    if (objectConstructor === "extern") {
-      if ( externalCtors.length === 0) {
-        throw new Error('No external constructor passed as argument to your class constructor');
+    if ((objectConstructor as ExternCtorPosition).extern) {
+      //beginning with 1 in meta not to confuse it with zero position arguments of class data itself
+      debug(() => `Extern constructor at arg position ${JSON.stringify(objectConstructor)}`)
+      const ctorArgPos = (objectConstructor as ExternCtorPosition).extern - 1;
+      if ( ctorArgPos >= externalCtors.length) {
+        throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
       }
-      const externalCtor = externalCtors.shift() as RTOVConstructor;
-      obj[prop] = new externalCtor(data);
+      obj[prop] = new externalCtors[ctorArgPos](data);
     } else {
       //this is the call to embedded class constructor
-      obj[prop] = new objectConstructor(data);
+      obj[prop] = new (objectConstructor as RTOVConstructor)(data);
     }
     schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
   } else {
