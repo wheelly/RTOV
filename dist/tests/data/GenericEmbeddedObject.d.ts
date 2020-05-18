@@ -8,7 +8,7 @@ export declare class GenericEmbeddedObject<T> {
     data: Partial<T>;
     booleanFieldDefault: boolean;
     definitions: RuntimeDefinitionsMap<number>;
-    finally: Object | undefined;
+    finally?: Object;
     constructor(args: Partial<GenericEmbeddedObject<T>>, objectConstructor: RTOVGenericConstructor<T>);
 }
 export {};

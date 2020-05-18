@@ -17,9 +17,6 @@ let GenericEmbeddedObject = class GenericEmbeddedObject {
         this.data = {};
         this.booleanFieldDefault = false;
         this.definitions = {};
-        //TODO: this won't work - need to add properties from args to the object
-        //finally?: Object;
-        this.finally = undefined;
     }
 };
 __decorate([
