@@ -23,6 +23,11 @@ export class GenericEmbeddedObject<T> {
   @property({type: "object"})
   definitions : RuntimeDefinitionsMap<number> = {};
 
+  //TODO: this won't work - need to add properties from args to the object
+  //finally?: Object;
+
+  finally: Object | undefined = undefined;
+
   constructor(args : Partial<GenericEmbeddedObject<T>>, objectConstructor: RTOVGenericConstructor<T>) {
   }
 

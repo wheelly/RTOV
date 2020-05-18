@@ -7,6 +7,7 @@ describe('Generic Valid Data', function () {
     const user = new GenericEmbeddedObject<ObjectData>({
       id: 2,
       definitions: { def: 1 },
+      finally: {"test" :"finally"},
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
     }, ObjectData);
 
@@ -17,6 +18,8 @@ describe('Generic Valid Data', function () {
     expect(user.definitions).to.deep.equal({def: 1})
     expect(user.booleanFieldDefault).to.equal(false);
     expect(user.data).to.deep.equal(newData);
+    expect(user.finally).to.deep.equal({"test" :"finally"});
+
   });
 
   it('Generic validate correct data assignment in embedded object  property', function () {

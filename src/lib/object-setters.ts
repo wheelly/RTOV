@@ -85,6 +85,8 @@ export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[],
     const metaData = getMetadata(obj, prop);
     if (metaData) {
       schemaProperties = {...schemaProperties, ...setValidator(ajv, externalCtors, metaData, obj, args[prop], prop)};
+    } else if (args.hasOwnProperty(prop)) { //for all other properties in args that are not under @property decorator
+      obj[prop] = args[prop];
     }
   }
   return schemaProperties;
