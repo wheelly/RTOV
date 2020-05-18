@@ -1,13 +1,13 @@
-import { ModelConstructor } from "./common";
+import { ObjectData } from "./ObjectData";
 declare type RuntimeDefinitionsMap<T> = {
     [resolverName: string]: T;
 };
-export declare class EmbeddedObject<T extends {}> {
+export declare class EmbeddedObject {
     id: number;
     organization: string;
-    data: Partial<T>;
+    data: Partial<ObjectData>;
     booleanFieldDefault: boolean;
     definitions: RuntimeDefinitionsMap<number>;
-    constructor(args: Partial<EmbeddedObject<T>>, embeddedConstructor: ModelConstructor<T>);
+    constructor(args: Partial<EmbeddedObject>);
 }
 export {};

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-export declare const getSchema: (object: Object) => void | Object;
+import { RTOVConstructor, ExternCtorPosition } from "./constructor";
 export declare function validate<T extends {
     new (...constructorArgs: any[]): any;
 }>(constructorFunction: T): any;
-export declare function property(schema: Object): (target: any, propertyKey: string) => void;
+export declare function property(schema: Object, objectConstructor?: RTOVConstructor | ExternCtorPosition): (target: any, propertyKey: string) => void;

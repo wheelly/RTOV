@@ -3,24 +3,31 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const AJV = require("ajv");
 const lib_1 = require("./lib");
-exports.getSchema = (object) => {
-    if (object.hasOwnProperty(lib_1.getPropName("schema"))) {
-        //@ts-ignore
-        return object[lib_1.getPropName("schema")];
-    }
-};
 /*
     This is a class decorator the instances of which you want to validate runtime
  */
 function validate(constructorFunction) {
     //new constructor function
-    let newConstructorFunction = function (args, extra) {
+    let newConstructorFunction = function (...constructorArgs) {
         //overriding constructor - setters instead of properties
         let schema = {};
+        let externalCtors = [];
         let func = function () {
-            let obj = new constructorFunction(args, extra);
+            //collecting all args
+            let args = {};
+            for (const itemArgs of constructorArgs) {
+                if (typeof itemArgs === 'function' && itemArgs.prototype.constructor.toString().startsWith('class')) {
+                    externalCtors.push(itemArgs);
+                }
+                else {
+                    args = { ...itemArgs, ...args };
+                }
+            }
+            //to construct default values and enable Reflect.metadata annotations we need to invoke constructor
+            let obj = new constructorFunction();
             const ajv = new AJV({ allErrors: true });
-            const properties = lib_1.addObjectSetters(ajv, obj, args);
+            //that's why we need to put here args again
+            const properties = lib_1.addObjectSetters(ajv, externalCtors, obj, args);
             schema = { type: "object", required: Object.keys(properties), properties };
             return obj;
         };
@@ -36,11 +43,11 @@ exports.validate = validate;
 /*
     This is property of object to be validated
  */
-function property(schema) {
+function property(schema, objectConstructor) {
     return function addValidationRule(target, propertyKey) {
         const className = target.constructor.name;
         lib_1.debug(() => `@property -> ${className}.${propertyKey} schema: ${JSON.stringify(schema)}`);
-        Reflect.defineMetadata("validation", { className, schema }, target, propertyKey);
+        Reflect.defineMetadata("validation", { className, schema, objectConstructor }, target, propertyKey);
     };
 }
 exports.property = property;

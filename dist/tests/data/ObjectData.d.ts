@@ -4,4 +4,5 @@ export declare class ObjectData {
     name: string;
     surname: string;
     description?: any;
+    constructor(args: ObjectData);
 }

@@ -46,7 +46,7 @@ describe('RtOVArray basic functionality', () => {
         const complexObj = new data_1.EmbeddedObject({
             id: 2,
             data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
-        }, data_1.ObjectData);
+        });
         const array = [666, complexObj];
         const rtOVArray = new rtov_array_1.RtOVArray(array, { className: 'test', schema });
         it('Instancing', () => {

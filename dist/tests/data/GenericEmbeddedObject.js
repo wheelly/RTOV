@@ -10,14 +10,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
-const ObjectData_1 = require("./ObjectData");
-let EmbeddedObject = class EmbeddedObject {
-    constructor(args) {
+let GenericEmbeddedObject = class GenericEmbeddedObject {
+    constructor(args, objectConstructor) {
         this.id = 0;
         this.organization = "";
         this.data = {};
         this.booleanFieldDefault = false;
         this.definitions = {};
+        //TODO: this won't work - need to add properties from args to the object
+        //finally?: Object;
+        this.finally = undefined;
     }
 };
 __decorate([
@@ -25,24 +27,24 @@ __decorate([
         type: "number", minimum: 1
     }),
     __metadata("design:type", Number)
-], EmbeddedObject.prototype, "id", void 0);
+], GenericEmbeddedObject.prototype, "id", void 0);
 __decorate([
     RTOV_1.property({
         type: "object",
-    }, ObjectData_1.ObjectData),
+    }, { extern: 1 }),
     __metadata("design:type", Object)
-], EmbeddedObject.prototype, "data", void 0);
+], GenericEmbeddedObject.prototype, "data", void 0);
 __decorate([
     RTOV_1.property({ type: "boolean" }),
     __metadata("design:type", Boolean)
-], EmbeddedObject.prototype, "booleanFieldDefault", void 0);
+], GenericEmbeddedObject.prototype, "booleanFieldDefault", void 0);
 __decorate([
     RTOV_1.property({ type: "object" }),
     __metadata("design:type", Object)
-], EmbeddedObject.prototype, "definitions", void 0);
-EmbeddedObject = __decorate([
+], GenericEmbeddedObject.prototype, "definitions", void 0);
+GenericEmbeddedObject = __decorate([
     RTOV_1.validate,
-    __metadata("design:paramtypes", [Object])
-], EmbeddedObject);
-exports.EmbeddedObject = EmbeddedObject;
-//# sourceMappingURL=EmbeddedObject.js.map
+    __metadata("design:paramtypes", [Object, Object])
+], GenericEmbeddedObject);
+exports.GenericEmbeddedObject = GenericEmbeddedObject;
+//# sourceMappingURL=GenericEmbeddedObject.js.map

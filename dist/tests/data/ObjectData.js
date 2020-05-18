@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
 let ObjectData = class ObjectData {
-    constructor() {
+    constructor(args) {
         this.currency = "ILS";
         this.name = "";
         this.surname = "";
@@ -33,7 +33,8 @@ __decorate([
     __metadata("design:type", String)
 ], ObjectData.prototype, "surname", void 0);
 ObjectData = __decorate([
-    RTOV_1.validate
+    RTOV_1.validate,
+    __metadata("design:paramtypes", [ObjectData])
 ], ObjectData);
 exports.ObjectData = ObjectData;
 //# sourceMappingURL=ObjectData.js.map

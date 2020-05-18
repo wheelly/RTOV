@@ -12,7 +12,7 @@ class RtOVArray extends IndexType {
         const itemMeta = this.itemsMetaData();
         for (let i = 0; i < items.length; i++) {
             this.addProperty(i.toString(), items[i]);
-            lib_1.setValidator(this.ajv, itemMeta, this, items[i], i.toString());
+            lib_1.setValidator(this.ajv, [], itemMeta, this, items[i], i.toString());
         }
         this.addProperty('length', items.length);
     }

@@ -1,6 +1,6 @@
 "use strict";
+//import {isComplexType} from "./index";
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("./index");
 const PROP_PREFIX = "__";
 exports.getPublicProperties = (obj) => Object.getOwnPropertyNames(obj).filter((prop) => !prop.startsWith(PROP_PREFIX));
 exports.getPropName = (name) => PROP_PREFIX + name;
@@ -11,16 +11,12 @@ exports.setReadOnlyProperty = (obj, prop, data) => {
         configurable: true //let it be redefined
     });
 };
-exports.setPropertyRecursive = (obj, prop, data) => {
-    if (index_1.isComplexType(obj[prop]) && !Array.isArray(obj[prop])) {
-        for (const subProp of exports.getPublicProperties(obj[prop])) {
-            exports.setPropertyRecursive(obj[prop], subProp, data[subProp]);
-        }
-        Object.assign(obj[prop], data); //initialization!!!!
-        exports.setReadOnlyProperty(obj, prop, obj[prop]);
-    }
-    else {
-        exports.setReadOnlyProperty(obj, prop, data);
-    }
-};
+// export const setPropertyRecursive = (obj: any, prop: string, data: any) => {
+//   if (isComplexType(obj[prop]) && isComplexType(data)) {
+//     for (const subProp of getPublicProperties(data)) {
+//       setPropertyRecursive(obj[prop], subProp, data[subProp]);
+//     }
+//   }
+//   setReadOnlyProperty(obj, prop, data);
+// }
 //# sourceMappingURL=prop-handlers.js.map
