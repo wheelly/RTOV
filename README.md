@@ -50,7 +50,7 @@ The library provides two decorators to inject validation into the class instance
 * @property - a parametrized property decorator.
 * Your instance will have getSchema() method which returns the complete validation schema for the object
 
-####Object example
+#### Object example
 
 ```typescript
 import {validate, property, getSchema} from "RTOV";
@@ -121,7 +121,7 @@ correctUser.data.currency = "ANY";
 correctUser.data = { }
 ```
 
-####Array example
+#### Array example
 
 ```typescript
 
@@ -168,6 +168,8 @@ const obj = new EmbeddedComplexArray({
   ]
 });
 ```
+
+Please look up test to see an example of working with generics
 
 ## Build
 
