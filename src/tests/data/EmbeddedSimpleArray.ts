@@ -19,11 +19,9 @@ export class EmbeddedSimpleArray {
     minItems: 1,
     maxItems: 3
   })
-  data : string[]
+  data : string[] = []
 
   constructor(args : EmbeddedSimpleArray) {
-    // mandatory here to validate embedded data
-    this.data = args.data;
   }
 
 }

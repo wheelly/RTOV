@@ -1,6 +1,5 @@
 import {validate, property} from "../../RTOV";
 import { EmbeddedObject} from "./EmbeddedObject";
-import {ObjectData } from "./ObjectData";
 
 @validate
 export class EmbeddedComplexArray {
@@ -25,11 +24,8 @@ export class EmbeddedComplexArray {
     minItems: 1,
     maxItems: 3
   })
-  data : (string | number | EmbeddedObject)[]
+  data : (string | number | EmbeddedObject)[] = []
 
   constructor(args : EmbeddedComplexArray) {
-    // mandatory here to validate embedded data
-    this.data = args.data;
   }
-
 }
