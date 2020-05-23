@@ -1,13 +1,8 @@
 import 'reflect-metadata';
 import * as AJV from "ajv";
-import {getPropName, setReadOnlyProperty, addObjectSetters, debug} from "./lib";
+import {setReadOnlyProperty, addObjectSetters, debug} from "./lib";
+import {RTOVConstructor, ExternCtorPosition} from "./constructor";
 
-export const getSchema = (object: Object): Object | void => {
-  if (object.hasOwnProperty(getPropName("schema"))) {
-    //@ts-ignore
-    return object[getPropName("schema")];
-  }
-}
 
 /*
     This is a class decorator the instances of which you want to validate runtime
@@ -15,13 +10,26 @@ export const getSchema = (object: Object): Object | void => {
 export function validate<T extends { new(...constructorArgs: any[]): any }>(constructorFunction: T) {
 
   //new constructor function
-  let newConstructorFunction: any = function (args: T, extra?: any[]) {
+  let newConstructorFunction: any = function (...constructorArgs: any[]) {
     //overriding constructor - setters instead of properties
     let schema = {};
+    let externalCtors : RTOVConstructor[] = []
     let func: any = function () {
-      let obj = new constructorFunction(args, extra);
+      //collecting all args
+      let args : any = {}
+      for ( const itemArgs of constructorArgs ) {
+        if ( typeof itemArgs === 'function' && itemArgs.prototype.constructor.toString().startsWith('class') ) {
+          externalCtors.push(itemArgs);
+        } else {
+          args = {...itemArgs, ...args};
+        }
+      }
+
+      //to construct default values and enable Reflect.metadata annotations we need to invoke constructor
+      let obj = new constructorFunction();
       const ajv: AJV.Ajv = new AJV({allErrors: true});
-      const properties = addObjectSetters(ajv, obj, args);
+      //that's why we need to put here args again
+      const properties = addObjectSetters(ajv, externalCtors, obj, args);
       schema = {type: "object", required: Object.keys(properties), properties};
       return obj;
     }
@@ -33,17 +41,15 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
   }
   newConstructorFunction.prototype = constructorFunction.prototype;
   return newConstructorFunction;
-
-
 }
 
 /*
     This is property of object to be validated
  */
-export function property(schema: Object) {
+export function property(schema: Object, objectConstructor?: RTOVConstructor | ExternCtorPosition) {
   return function addValidationRule(target: any, propertyKey: string) {
     const className = target.constructor.name;
     debug(() => `@property -> ${className}.${propertyKey} schema: ${JSON.stringify(schema)}`);
-    Reflect.defineMetadata("validation", {className, schema}, target, propertyKey);
+    Reflect.defineMetadata("validation", {className, schema, objectConstructor}, target, propertyKey);
   }
 }

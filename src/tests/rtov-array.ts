@@ -1,6 +1,6 @@
 import {RtOVArray } from "../rtov-array";
 import {assert, expect} from 'chai';
-import {EmbeddedObject, ObjectData} from "./data";
+import {EmbeddedObject} from "./data";
 
 describe('RtOVArray basic functionality', () => {
 
@@ -49,10 +49,10 @@ describe('RtOVArray basic functionality', () => {
         {type: "number"},
       ]
     };
-    const complexObj = new EmbeddedObject<ObjectData>({
+    const complexObj = new EmbeddedObject({
       id: 2,
       data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-    }, ObjectData);
+    });
 
     const array = [666, complexObj];
     const rtOVArray = new RtOVArray<typeof complexObj | number>(array, {className: 'test', schema});
@@ -63,12 +63,12 @@ describe('RtOVArray basic functionality', () => {
     })
 
     it('correct assignment in complex object', () => {
-      (rtOVArray[1] as EmbeddedObject<ObjectData>).data.currency = "USD";
+      (rtOVArray[1] as EmbeddedObject).data.currency = "USD";
     });
 
     it('incorrect assignment in complex object', () => {
       assert.throw(() =>{
-        (rtOVArray[1] as EmbeddedObject<ObjectData>).data =  {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
+        (rtOVArray[1] as EmbeddedObject).data =  {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
       }, '[{"keyword":"enum","dataPath":".currency",' +
         '"schemaPath":"#/properties/currency/enum","' +
         'params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]')

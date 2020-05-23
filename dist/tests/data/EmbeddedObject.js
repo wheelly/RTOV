@@ -10,14 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
+const ObjectData_1 = require("./ObjectData");
 let EmbeddedObject = class EmbeddedObject {
-    constructor(args, embeddedConstructor) {
+    constructor(args) {
         this.id = 0;
         this.organization = "";
+        this.data = {};
         this.booleanFieldDefault = false;
         this.definitions = {};
-        // mandatory here to validate embedded data
-        this.data = new embeddedConstructor(args.data);
     }
 };
 __decorate([
@@ -29,7 +29,7 @@ __decorate([
 __decorate([
     RTOV_1.property({
         type: "object",
-    }),
+    }, ObjectData_1.ObjectData),
     __metadata("design:type", Object)
 ], EmbeddedObject.prototype, "data", void 0);
 __decorate([
@@ -42,7 +42,7 @@ __decorate([
 ], EmbeddedObject.prototype, "definitions", void 0);
 EmbeddedObject = __decorate([
     RTOV_1.validate,
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [Object])
 ], EmbeddedObject);
 exports.EmbeddedObject = EmbeddedObject;
 //# sourceMappingURL=EmbeddedObject.js.map

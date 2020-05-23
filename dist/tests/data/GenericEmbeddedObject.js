@@ -10,10 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
-let EmbeddedSimpleArray = class EmbeddedSimpleArray {
-    constructor(args) {
+let GenericEmbeddedObject = class GenericEmbeddedObject {
+    constructor(args, objectConstructor) {
         this.id = 0;
-        this.data = [];
+        this.organization = "";
+        this.data = {};
+        this.booleanFieldDefault = false;
+        this.definitions = {};
     }
 };
 __decorate([
@@ -21,22 +24,24 @@ __decorate([
         type: "number", minimum: 1
     }),
     __metadata("design:type", Number)
-], EmbeddedSimpleArray.prototype, "id", void 0);
+], GenericEmbeddedObject.prototype, "id", void 0);
 __decorate([
     RTOV_1.property({
-        type: "array",
-        items: [
-            { type: "string" }
-        ],
-        uniqueItems: true,
-        minItems: 1,
-        maxItems: 3
-    }),
-    __metadata("design:type", Array)
-], EmbeddedSimpleArray.prototype, "data", void 0);
-EmbeddedSimpleArray = __decorate([
+        type: "object",
+    }, { extern: 1 }),
+    __metadata("design:type", Object)
+], GenericEmbeddedObject.prototype, "data", void 0);
+__decorate([
+    RTOV_1.property({ type: "boolean" }),
+    __metadata("design:type", Boolean)
+], GenericEmbeddedObject.prototype, "booleanFieldDefault", void 0);
+__decorate([
+    RTOV_1.property({ type: "object" }),
+    __metadata("design:type", Object)
+], GenericEmbeddedObject.prototype, "definitions", void 0);
+GenericEmbeddedObject = __decorate([
     RTOV_1.validate,
-    __metadata("design:paramtypes", [EmbeddedSimpleArray])
-], EmbeddedSimpleArray);
-exports.EmbeddedSimpleArray = EmbeddedSimpleArray;
-//# sourceMappingURL=EmbeddedSimpleArray.js.map
+    __metadata("design:paramtypes", [Object, Object])
+], GenericEmbeddedObject);
+exports.GenericEmbeddedObject = GenericEmbeddedObject;
+//# sourceMappingURL=GenericEmbeddedObject.js.map

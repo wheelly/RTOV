@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const data_1 = require("./data");
-const decorators_1 = require("../decorators");
+const get_schema_1 = require("../get-schema");
 const chai_1 = require("chai");
 describe('EmbeddedArray Invalid Data', function () {
     describe('Simple Array: Property Instancing Validation', function () {
@@ -21,7 +21,7 @@ describe('EmbeddedArray Invalid Data', function () {
                     id: 2,
                     data: ["zack"]
                 });
-                console.log(JSON.stringify(decorators_1.getSchema(obj)));
+                console.log(JSON.stringify(get_schema_1.getSchema(obj)));
                 console.log(JSON.stringify(obj));
                 //@ts-ignore
                 obj.data[0] = 1;
@@ -42,10 +42,10 @@ describe('EmbeddedArray Invalid Data', function () {
                         new data_1.EmbeddedObject({
                             id: 2,
                             data: { currency: "ILS", name: "Boris", surname: "Kolesnikov" }
-                        }, data_1.ObjectData)
+                        })
                     ]
                 });
-                console.log(JSON.stringify(decorators_1.getSchema(obj)));
+                console.log(JSON.stringify(get_schema_1.getSchema(obj)));
                 console.log(JSON.stringify(obj));
                 obj.data[2].data.currency = "ANY";
             }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum",' +

@@ -1,10 +1,9 @@
-import {validate, property} from "../../RTOV";
-import { ObjectData } from "./ObjectData";
+import {validate, property, RTOVGenericConstructor } from "../../RTOV";
 
 type RuntimeDefinitionsMap<T> =  { [resolverName: string] : T}
 
 @validate
-export class EmbeddedObject {
+export class GenericEmbeddedObject<T> {
 
   @property({
     type: "number", minimum: 1
@@ -15,8 +14,8 @@ export class EmbeddedObject {
 
   @property({
     type: "object",
-  }, ObjectData)
-  data : Partial<ObjectData> = {};
+  }, { extern: 1 })
+  data : Partial<T> = {};
 
   @property({type: "boolean"})
   booleanFieldDefault: boolean = false
@@ -24,7 +23,9 @@ export class EmbeddedObject {
   @property({type: "object"})
   definitions : RuntimeDefinitionsMap<number> = {};
 
-  constructor(args : Partial<EmbeddedObject>) {
+  finally?: Object;
+
+  constructor(args : Partial<GenericEmbeddedObject<T>>, objectConstructor: RTOVGenericConstructor<T>) {
   }
 
 }

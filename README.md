@@ -50,34 +50,14 @@ The library provides two decorators to inject validation into the class instance
 * @property - a parametrized property decorator.
 * Your instance will have getSchema() method which returns the complete validation schema for the object
 
+####Object example
+
 ```typescript
-import {validate, property, getSchema} from "../RTOV";
+import {validate, property, getSchema} from "RTOV";
 
-//embedded instance validation
 @validate
-class ExampleUserData {
-  @property({
-    type: "string",
-    enum: ["ILS", "EUR", "USD"]
-  })
-  currency: "ILS" | "EUR" | "USD" | "ANY" = "ILS"
+class EmbeddedObject {
 
-  @property({type: "string"})
-  name: string = ""
-
-  @property({type: "string"})
-  surname: string = ""
-
-  description?: any;
-}
-
-interface ModelConstructor<T> {
-  new(...args: any[]): T;
-}
-
-//main instance validation
-@validate
-class ExampleUser {
   @property({
     type: "number", minimum: 1
   })
@@ -87,26 +67,49 @@ class ExampleUser {
 
   @property({
     type: "object",
-  })
-  data : ExampleUserData;
+  }, ObjectData)
+  data : Partial<ObjectData> = {};
 
-  constructor(args : Partial<ExampleUser>) {
-    // mandatory here to validate embedded data
-    this.data = new (ExampleUserData as ModelConstructor<ExampleUserData>)(args.data);
+  @property({type: "boolean"})
+  booleanFieldDefault: boolean = false
+
+  constructor(args : Partial<EmbeddedObject>) {
   }
 }
 
+type CurrencyType = "ILS" | "EUR" | "USD" | "ANY"
+
+@validate
+class ObjectData {
+  @property({
+    type: "string",
+    enum: ["ILS", "EUR", "USD"]
+  })
+  currency: CurrencyType  = "ILS"
+
+  @property({type: "string"})
+  name: string = ""
+
+  @property({type: "string"})
+  surname: string = ""
+
+  description?: any;
+
+  constructor(args : ObjectData) {}
+}
+
+
 //instancing - that where throw will happen
-const user = new ExampleUser({
+const invalidObj = new EmbeddedObject({
   id: 2,
   data: {currency: "ANY", name: "Boris", surname: "Kolesnikov"}
 });
 
 //fix the above line to see the whole schema
-console.log(getSchema(user))
+console.log(JSON.stringify(getSchema(invalidObj)))
 
 //instancing - that where throw will happen
-const correctUser = new ExampleUser({
+const correctUser = new EmbeddedObject({
   id: 2,
   data: {currency: "USD", name: "Boris", surname: "Kolesnikov"}
 });
@@ -116,6 +119,54 @@ correctUser.data.currency = "ANY";
 
 //@ts-ignore
 correctUser.data = { }
+```
+
+####Array example
+
+```typescript
+
+...
+
+@validate
+export class EmbeddedComplexArray {
+
+  @property({
+    type: "number", minimum: 1
+  })
+  id: number = 0;
+
+  organization?: string;
+
+  @property({
+    type: "array",
+    items: {
+      "oneOf": [
+      { type: "string" },
+      { type: "object"},
+      { type: "number"},
+      ]
+    },
+    uniqueItems: true,
+    minItems: 1,
+    maxItems: 3
+  })
+  data : (string | number | EmbeddedObject)[] = []
+
+  constructor(args : EmbeddedComplexArray) {
+  }
+}
+
+const obj = new EmbeddedComplexArray({
+  id: 2,
+  data: [
+    "zack",
+    666,
+    new EmbeddedObject({
+      id: 2,
+      data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
+    })
+  ]
+});
 ```
 
 ## Build
@@ -145,7 +196,7 @@ yarn tests
 ## TODO
 
 * Custom validators support
-* Array - re-validation of array when one of its items being assigned in case of allOf and oneOf
+* Array - re-validation of array when one of its items assigned in case of allOf and oneOf
 
 ## Bugs
 

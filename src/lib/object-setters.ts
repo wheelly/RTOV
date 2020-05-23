@@ -1,23 +1,33 @@
 import * as AJV from "ajv";
 import {
   getPropName,
-  setPropertyRecursive,
-  isComplexType,
   getPublicProperties,
   debug,
   MetaData,
   SchemaOfArray, setReadOnlyProperty,
 } from "./";
 
-import { RtOVArray } from "../RTOV";
+import {RtOVArray, getSchema, RTOVConstructor, ExternCtorPosition} from "../RTOV";
 
-export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValue: any, prop: string) => {
-  let schemaProperties : any = {}
-  const {className, schema} = metaData;
+export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], metaData: MetaData, obj: any, data: any, prop: string) => {
+  let schemaProperties: any = {}
+  const {className, schema, objectConstructor} = metaData;
 
-  if (isComplexType(obj[prop]) && ! Array.isArray(obj[prop])) {
-    const embeddedProperties = addObjectSetters(ajv, obj[prop], newValue);
-    schemaProperties[prop] = {...schema, required: Object.keys(embeddedProperties), properties: embeddedProperties};
+  if (objectConstructor) {
+
+    if ((objectConstructor as ExternCtorPosition).extern) {
+      //beginning with 1 in meta not to confuse it with zero position arguments of class data itself
+      debug(() => `Extern constructor at arg position ${JSON.stringify(objectConstructor)}`)
+      const ctorArgPos = (objectConstructor as ExternCtorPosition).extern - 1;
+      if ( ctorArgPos >= externalCtors.length) {
+        throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
+      }
+      obj[prop] = new externalCtors[ctorArgPos](data);
+    } else {
+      //this is the call to embedded class constructor
+      obj[prop] = new (objectConstructor as RTOVConstructor)(data);
+    }
+    schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
   } else {
     schemaProperties[prop] = schema;
   }
@@ -27,6 +37,7 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
   ajv.addSchema({"$id": schemaId, ...schemaProperties[prop]});
 
   const propValidator = (data: any) => {
+
     const validate = ajv.getSchema(schemaId);
     if (validate && !validate(data)) {
       throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
@@ -34,23 +45,34 @@ export const setValidator = (ajv: AJV.Ajv, metaData: MetaData, obj: any, newValu
 
     const schemaOfArray = schema as SchemaOfArray;
 
-    if ( Array.isArray(obj[prop]) && schemaOfArray.type && schemaOfArray.type === 'array') {
+    if (Array.isArray(obj[prop])) {
       debug(() => 'Array with type array in schema converting to RtOVArray');
+      if (schemaOfArray.type && schemaOfArray.type !== 'array') {
+        throw new Error('Incorrect schema type -> must be "array"');
+      }
       setReadOnlyProperty(obj, prop, new RtOVArray<any>(data, metaData, ajv));
     } else {
-      setPropertyRecursive(obj, prop, data);
+
+      setReadOnlyProperty(obj, prop, data);
     }
   };
 
-  //default values from constructor processed here
-  propValidator(newValue === undefined ? obj[prop] : newValue); //validate on construction
+  /*
+    1. Instance property if we have a objectConstructor
+    2. Otherwise data (args) if any or default value from obj[prop]
+    *** Default values are constructed in decorator.ts -> let obj = new constructorFunction();
+   */
+  const getData = (): any => objectConstructor ? obj[prop] : data || obj[prop];
+
+  //when instancing we need to call here propValidator (then it will be called on assignment as a setter)
+  propValidator(getData()); //validate on construction
   obj.__defineSetter__(prop, propValidator);
   obj.__defineGetter__(prop, () => obj[getPropName(prop)]);
   return schemaProperties;
 }
 
 
-export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
+export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], obj: any, args: any) => {
 
   const getMetadata = (obj: any, prop: string) => {
     const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
@@ -59,11 +81,21 @@ export const addObjectSetters = (ajv: AJV.Ajv, obj: any, args: any) => {
 
   let schemaProperties: any = {};
 
+  const argsPropSet = new Set(Object.getOwnPropertyNames(args));
+
   for (const prop of getPublicProperties(obj)) {
     const metaData = getMetadata(obj, prop);
     if (metaData) {
-      schemaProperties = Object.assign(schemaProperties, setValidator(ajv, metaData, obj, args[prop], prop));
+      schemaProperties = {...schemaProperties, ...setValidator(ajv, externalCtors, metaData, obj, args[prop], prop)};
+    } else if (args.hasOwnProperty(prop)) { //for all other properties in args that are not under @property decorator
+      obj[prop] = args[prop];
     }
+    argsPropSet.delete(prop); //delete prop from argsSet that exists both in object and args
+  }
+
+  //properties of args that does not exist in object (like class F { some?: Object } )
+  for ( const prop of argsPropSet ) {
+    obj[prop] = args[prop];
   }
 
   return schemaProperties;

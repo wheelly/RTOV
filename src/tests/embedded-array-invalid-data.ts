@@ -1,5 +1,5 @@
-import {EmbeddedSimpleArray, EmbeddedComplexArray, EmbeddedObject, ObjectData} from "./data";
-import {getSchema} from "../decorators";
+import {EmbeddedSimpleArray, EmbeddedComplexArray, EmbeddedObject} from "./data";
+import {getSchema} from "../get-schema"
 import {assert} from 'chai';
 
 describe('EmbeddedArray Invalid Data', function () {
@@ -41,15 +41,15 @@ describe('EmbeddedArray Invalid Data', function () {
           data: [
             "zack",
             666,
-            new EmbeddedObject<ObjectData>({
+            new EmbeddedObject({
               id: 2,
               data: {currency: "ILS", name: "Boris", surname: "Kolesnikov"}
-            }, ObjectData)
+            })
           ]
         });
         console.log(JSON.stringify(getSchema(obj)));
         console.log(JSON.stringify(obj));
-        (obj.data[2] as EmbeddedObject<ObjectData>).data.currency = "ANY"
+        (obj.data[2] as EmbeddedObject).data.currency = "ANY"
       }, '[{"keyword":"enum","dataPath":"","schemaPath":"#/enum",' +
         '"params":{"allowedValues":["ILS","EUR","USD"]},"message":"should be equal to one of the allowed values"}]');
     });
