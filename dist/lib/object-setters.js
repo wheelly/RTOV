@@ -71,7 +71,7 @@ exports.addObjectSetters = (ajv, externalCtors, obj, args) => {
         else if (args.hasOwnProperty(prop)) { //for all other properties in args that are not under @property decorator
             obj[prop] = args[prop];
         }
-        argsPropSet.delete(prop);
+        argsPropSet.delete(prop); //delete prop from argsSet that exists both in object and args
     }
     //properties of args that does not exist in object (like class F { some?: Object } )
     for (const prop of argsPropSet) {

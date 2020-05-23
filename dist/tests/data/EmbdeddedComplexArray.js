@@ -13,8 +13,7 @@ const RTOV_1 = require("../../RTOV");
 let EmbeddedComplexArray = class EmbeddedComplexArray {
     constructor(args) {
         this.id = 0;
-        // mandatory here to validate embedded data
-        this.data = args.data;
+        this.data = [];
     }
 };
 __decorate([
