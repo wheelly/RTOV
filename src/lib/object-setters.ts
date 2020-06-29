@@ -38,8 +38,11 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
 
   const propValidator = (data: any) => {
 
+    debug(() => `Getting object schema id ${schemaId} for data ${JSON.stringify(data)}`)
     const validate = ajv.getSchema(schemaId);
-    if (validate && !validate(data)) {
+    //in case it's embedded model and we work with array we have here RTOVArray which ajv does not eat as Array
+    const plainData = JSON.parse(JSON.stringify(data));
+    if (validate && !validate(plainData)) {
       throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
     }
 
