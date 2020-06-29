@@ -28,8 +28,11 @@ exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
     _1.debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(schemaProperties[prop])}`);
     ajv.addSchema({ "$id": schemaId, ...schemaProperties[prop] });
     const propValidator = (data) => {
+        _1.debug(() => `Getting object schema id ${schemaId} for data ${JSON.stringify(data)}`);
         const validate = ajv.getSchema(schemaId);
-        if (validate && !validate(data)) {
+        //in case it's embedded model and we work with array we have here RTOVArray which ajv does not eat as Array
+        const plainData = JSON.parse(JSON.stringify(data));
+        if (validate && !validate(plainData)) {
             throw new Error(`[${prop}]=${JSON.stringify(validate.errors)}`);
         }
         const schemaOfArray = schema;
