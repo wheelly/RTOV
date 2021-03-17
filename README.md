@@ -65,6 +65,13 @@ class EmbeddedObject {
 
   organization: string = "";
 
+  /**
+  the second optional parameter is ObjectConstuctor 
+  which constructs embedded object
+  This construction for non-array objects only. 
+  For array have to construct elements of this instance.
+  For array the ObjectConstructor just generates the proper openapi schema for elements    
+   **/
   @property({
     type: "object",
   }, ObjectData)

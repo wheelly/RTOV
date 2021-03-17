@@ -1,1 +1,3 @@
-export declare const getSchema: (object: Object) => void | Object;
+export declare const getSchema: (object: {
+    [name: string]: any;
+}) => any;

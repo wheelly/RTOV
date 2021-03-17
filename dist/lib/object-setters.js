@@ -5,6 +5,8 @@ const RTOV_1 = require("../RTOV");
 exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
     let schemaProperties = {};
     const { className, schema, objectConstructor } = metaData;
+    //property schema generation section start
+    let oneArrayElem = undefined;
     if (objectConstructor) {
         if (objectConstructor.extern) {
             //beginning with 1 in meta not to confuse it with zero position arguments of class data itself
@@ -13,17 +15,33 @@ exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
             if (ctorArgPos >= externalCtors.length) {
                 throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
             }
-            obj[prop] = new externalCtors[ctorArgPos](data);
+            if (!Array.isArray(data)) {
+                obj[prop] = new externalCtors[ctorArgPos](data);
+            }
+            else {
+                oneArrayElem = new externalCtors[ctorArgPos](data);
+            }
         }
         else {
-            //this is the call to embedded class constructor
-            obj[prop] = new objectConstructor(data);
+            if (!Array.isArray(data)) {
+                obj[prop] = new objectConstructor(data);
+            }
+            else {
+                oneArrayElem = new objectConstructor(data);
+            }
         }
-        schemaProperties[prop] = { ...schema, ...RTOV_1.getSchema(obj[prop]) };
+        if (!Array.isArray(data)) {
+            schemaProperties[prop] = { ...schema, ...RTOV_1.getSchema(obj[prop]) };
+        }
+        else {
+            schema.items = { type: "object", ...RTOV_1.getSchema(oneArrayElem) };
+            schemaProperties[prop] = schema;
+        }
     }
     else {
         schemaProperties[prop] = schema;
     }
+    //property schema generation section end
     const schemaId = className + ':' + prop;
     _1.debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(schemaProperties[prop])}`);
     ajv.addSchema({ "$id": schemaId, ...schemaProperties[prop] });
