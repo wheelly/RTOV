@@ -8,4 +8,5 @@ __export(require("./ObjectData"));
 __export(require("./EmbeddedSimpleArray"));
 __export(require("./EmbdeddedComplexArray"));
 __export(require("./GenericEmbeddedObject"));
+__export(require("./EmbeddedArraySameComplexObjects"));
 //# sourceMappingURL=index.js.map

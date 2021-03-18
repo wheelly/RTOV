@@ -13,6 +13,10 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
   let schemaProperties: any = {}
   const {className, schema, objectConstructor} = metaData;
 
+  //property schema generation section start
+
+  let oneArrayElem: any = undefined
+
   if (objectConstructor) {
 
     if ((objectConstructor as ExternCtorPosition).extern) {
@@ -22,15 +26,30 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
       if ( ctorArgPos >= externalCtors.length) {
         throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
       }
-      obj[prop] = new externalCtors[ctorArgPos](data);
+      if (! Array.isArray(data)) {
+        obj[prop] = new externalCtors[ctorArgPos](data);
+      } else {
+        oneArrayElem = new externalCtors[ctorArgPos](data);
+      }
     } else {
-      //this is the call to embedded class constructor
-      obj[prop] = new (objectConstructor as RTOVConstructor)(data);
+      if (! Array.isArray(data)) {
+        obj[prop] = new (objectConstructor as RTOVConstructor)(data);
+      } else {
+        oneArrayElem = new (objectConstructor as RTOVConstructor)(data);
+      }
     }
-    schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
+
+    if (! Array.isArray(data))  {
+      schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
+    } else {
+      (<any>schema).items = {type: "object", ...getSchema(oneArrayElem)}
+      schemaProperties[prop] = schema;
+    }
   } else {
     schemaProperties[prop] = schema;
   }
+
+  //property schema generation section end
 
   const schemaId = className + ':' + prop
   debug(() => `@validate -> Adding ${schemaId} schema: ${JSON.stringify(schemaProperties[prop])}`);

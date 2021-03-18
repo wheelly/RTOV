@@ -1,8 +1,8 @@
 import {getPropName} from "./lib";
 
-export const getSchema = (object: Object): Object | void => {
-  if (object.hasOwnProperty(getPropName("schema"))) {
-    //@ts-ignore
-    return object[getPropName("schema")];
+export const getSchema = (object: {[name: string] : any}): any => {
+  if (! object.hasOwnProperty(getPropName("schema"))) {
+    throw Error("This is not a RTOV instance - cannot get openapi schema");
   }
+ return object[getPropName("schema")];
 }
