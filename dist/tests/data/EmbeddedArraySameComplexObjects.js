@@ -14,6 +14,7 @@ const ObjectData_1 = require("./ObjectData");
 let EmbeddedArraySameObjects = class EmbeddedArraySameObjects {
     constructor(args) {
         this.id = 0;
+        this.organization = "001";
         this.elems = [];
     }
 };
@@ -23,6 +24,14 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], EmbeddedArraySameObjects.prototype, "id", void 0);
+__decorate([
+    RTOV_1.property({
+        type: "string",
+        minLength: 3,
+        optional: true
+    }),
+    __metadata("design:type", String)
+], EmbeddedArraySameObjects.prototype, "organization", void 0);
 __decorate([
     RTOV_1.property({
         type: "array",

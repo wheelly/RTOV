@@ -9,7 +9,12 @@ export class EmbeddedArraySameObjects {
   })
   id: number = 0;
 
-  organization?: string;
+  @property({
+    type: "string",
+    minLength: 3,
+    optional: true
+  })
+  organization?: string = "001";
 
   @property({
     type: "array",

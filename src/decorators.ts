@@ -29,8 +29,8 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
       let obj = new constructorFunction();
       const ajv: AJV.Ajv = new AJV({allErrors: true});
       //that's why we need to put here args again
-      const properties = addObjectSetters(ajv, externalCtors, obj, args);
-      schema = {type: "object", required: Object.keys(properties), properties};
+      const {required, properties} = addObjectSetters(ajv, externalCtors, obj, args);
+      schema = {type: "object", required, properties};
       return obj;
     }
     func.prototype = constructorFunction.prototype;

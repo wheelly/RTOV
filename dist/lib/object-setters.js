@@ -83,10 +83,18 @@ exports.addObjectSetters = (ajv, externalCtors, obj, args) => {
         return metaData && Object.keys(metaData).length ? metaData : undefined;
     };
     let schemaProperties = {};
+    const required = [];
     const argsPropSet = new Set(Object.getOwnPropertyNames(args));
     for (const prop of _1.getPublicProperties(obj)) {
         const metaData = getMetadata(obj, prop);
         if (metaData) {
+            const optional = metaData.schema.optional;
+            if (optional) {
+                delete metaData.schema.optional; //removing optional - it's not an openapi standard
+            }
+            else {
+                required.push(prop);
+            }
             schemaProperties = { ...schemaProperties, ...exports.setValidator(ajv, externalCtors, metaData, obj, args[prop], prop) };
         }
         else if (args.hasOwnProperty(prop)) { //for all other properties in args that are not under @property decorator
@@ -98,6 +106,6 @@ exports.addObjectSetters = (ajv, externalCtors, obj, args) => {
     for (const prop of argsPropSet) {
         obj[prop] = args[prop];
     }
-    return schemaProperties;
+    return { required, properties: schemaProperties };
 };
 //# sourceMappingURL=object-setters.js.map

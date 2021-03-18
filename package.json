@@ -1,6 +1,6 @@
 {
   "name": "RTOV",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Runtime Object Validation Library",
   "main": "dist/RTOV.js",
   "author": "Boris Kolesnikov",

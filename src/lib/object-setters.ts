@@ -103,11 +103,19 @@ export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[],
 
   let schemaProperties: any = {};
 
+  const required : Array<string> = [];
+
   const argsPropSet = new Set(Object.getOwnPropertyNames(args));
 
   for (const prop of getPublicProperties(obj)) {
     const metaData = getMetadata(obj, prop);
     if (metaData) {
+      const optional = metaData.schema.optional;
+      if (optional) {
+        delete metaData.schema.optional; //removing optional - it's not an openapi standard
+      } else {
+        required.push(prop);
+      }
       schemaProperties = {...schemaProperties, ...setValidator(ajv, externalCtors, metaData, obj, args[prop], prop)};
     } else if (args.hasOwnProperty(prop)) { //for all other properties in args that are not under @property decorator
       obj[prop] = args[prop];
@@ -120,6 +128,6 @@ export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[],
     obj[prop] = args[prop];
   }
 
-  return schemaProperties;
+  return { required, properties: schemaProperties };
 
 };

@@ -27,8 +27,8 @@ function validate(constructorFunction) {
             let obj = new constructorFunction();
             const ajv = new AJV({ allErrors: true });
             //that's why we need to put here args again
-            const properties = lib_1.addObjectSetters(ajv, externalCtors, obj, args);
-            schema = { type: "object", required: Object.keys(properties), properties };
+            const { required, properties } = lib_1.addObjectSetters(ajv, externalCtors, obj, args);
+            schema = { type: "object", required, properties };
             return obj;
         };
         func.prototype = constructorFunction.prototype;

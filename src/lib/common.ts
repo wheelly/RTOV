@@ -4,7 +4,7 @@ export type SchemaItemType = "number" | "integer" |  "string" | "boolean" | "arr
 
 export interface MetaData {
   className: string;
-  schema: Object;
+  schema: Object & {optional? : true}; //this will not get into required properties
   objectConstructor?: RTOVConstructor | ExternCtorPosition;
 }
 

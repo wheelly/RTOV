@@ -176,6 +176,40 @@ const obj = new EmbeddedComplexArray({
 });
 ```
 
+### Optional example
+
+```typescript
+...
+
+@validate
+export class EmbeddedArraySameObjects {
+
+  @property({
+    type: "number", minimum: 1
+  })
+  id: number = 0;
+
+  @property({
+    type: "string",
+    minLength: 3,
+    optional: true //this will remove property from required fields
+  })
+  organization?: string = "001";
+
+  @property({
+    type: "array",
+    items: {
+      type: "object",
+    }
+  }, ObjectData)
+  elems : Array<ObjectData> = []
+
+  constructor(args? : EmbeddedArraySameObjects) {
+  }
+}
+
+```
+
 Please look up test to see an example of working with generics
 
 ## Build
