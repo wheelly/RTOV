@@ -26,20 +26,20 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
       if ( ctorArgPos >= externalCtors.length) {
         throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
       }
-      if (! Array.isArray(data)) {
+      if ((<any>schema).type !== 'array') {
         obj[prop] = new externalCtors[ctorArgPos](data);
       } else {
         oneArrayElem = new externalCtors[ctorArgPos](data);
       }
     } else {
-      if (! Array.isArray(data)) {
+      if ((<any>schema).type !== 'array') {
         obj[prop] = new (objectConstructor as RTOVConstructor)(data);
       } else {
         oneArrayElem = new (objectConstructor as RTOVConstructor)(data);
       }
     }
 
-    if (! Array.isArray(data))  {
+    if ((<any>schema).type !== 'array')  {
       schemaProperties[prop] = {...schema, ...getSchema(obj[prop])};
     } else {
       (<any>schema).items = {type: "object", ...getSchema(oneArrayElem)}

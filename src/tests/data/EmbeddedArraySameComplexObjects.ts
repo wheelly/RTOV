@@ -7,7 +7,7 @@ export class EmbeddedArraySameObjects {
   @property({
     type: "number", minimum: 1
   })
-  id: number = 0;
+  id: number = 1;
 
   @property({
     type: "string",
@@ -24,6 +24,4 @@ export class EmbeddedArraySameObjects {
   }, ObjectData)
   elems : Array<ObjectData> = []
 
-  constructor(args? : EmbeddedArraySameObjects) {
-  }
 }

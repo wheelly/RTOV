@@ -15,7 +15,7 @@ exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
             if (ctorArgPos >= externalCtors.length) {
                 throw new Error(`No external constructor mapped to position ${ctorArgPos + 1} passed as argument to your class constructor`);
             }
-            if (!Array.isArray(data)) {
+            if (schema.type !== 'array') {
                 obj[prop] = new externalCtors[ctorArgPos](data);
             }
             else {
@@ -23,14 +23,14 @@ exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
             }
         }
         else {
-            if (!Array.isArray(data)) {
+            if (schema.type !== 'array') {
                 obj[prop] = new objectConstructor(data);
             }
             else {
                 oneArrayElem = new objectConstructor(data);
             }
         }
-        if (!Array.isArray(data)) {
+        if (schema.type !== 'array') {
             schemaProperties[prop] = { ...schema, ...RTOV_1.getSchema(obj[prop]) };
         }
         else {

@@ -12,8 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const RTOV_1 = require("../../RTOV");
 const ObjectData_1 = require("./ObjectData");
 let EmbeddedArraySameObjects = class EmbeddedArraySameObjects {
-    constructor(args) {
-        this.id = 0;
+    constructor() {
+        this.id = 1;
         this.organization = "001";
         this.elems = [];
     }
@@ -42,8 +42,7 @@ __decorate([
     __metadata("design:type", Array)
 ], EmbeddedArraySameObjects.prototype, "elems", void 0);
 EmbeddedArraySameObjects = __decorate([
-    RTOV_1.validate,
-    __metadata("design:paramtypes", [EmbeddedArraySameObjects])
+    RTOV_1.validate
 ], EmbeddedArraySameObjects);
 exports.EmbeddedArraySameObjects = EmbeddedArraySameObjects;
 //# sourceMappingURL=EmbeddedArraySameComplexObjects.js.map
