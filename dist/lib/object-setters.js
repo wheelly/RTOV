@@ -77,16 +77,16 @@ exports.setValidator = (ajv, externalCtors, metaData, obj, data, prop) => {
     obj.__defineGetter__(prop, () => obj[_1.getPropName(prop)]);
     return schemaProperties;
 };
-exports.addObjectSetters = (ajv, externalCtors, obj, args) => {
-    const getMetadata = (obj, prop) => {
-        const metaData = Reflect.getMetadata("validation", obj, prop);
+exports.addObjectSetters = (ajv, externalCtors, target, obj, args) => {
+    const getMetadata = (prop) => {
+        const metaData = Reflect.getMetadata("validation", target, prop);
         return metaData && Object.keys(metaData).length ? metaData : undefined;
     };
     let schemaProperties = {};
     const required = [];
     const argsPropSet = new Set(Object.getOwnPropertyNames(args));
     for (const prop of _1.getPublicProperties(obj)) {
-        const metaData = getMetadata(obj, prop);
+        const metaData = getMetadata(prop);
         if (metaData) {
             const optional = metaData.schema.optional;
             if (optional) {

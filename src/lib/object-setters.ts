@@ -94,10 +94,10 @@ export const setValidator = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], met
 }
 
 
-export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], obj: any, args: any) => {
+export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[], target: Object, obj: any, args: any) => {
 
-  const getMetadata = (obj: any, prop: string) => {
-    const metaData: MetaData | void = Reflect.getMetadata("validation", obj, prop);
+  const getMetadata = (prop: string) => {
+    const metaData: MetaData | void = Reflect.getMetadata("validation", target, prop);
     return metaData && Object.keys(metaData).length ? metaData : undefined;
   };
 
@@ -108,7 +108,7 @@ export const addObjectSetters = (ajv: AJV.Ajv, externalCtors: RTOVConstructor[],
   const argsPropSet = new Set(Object.getOwnPropertyNames(args));
 
   for (const prop of getPublicProperties(obj)) {
-    const metaData = getMetadata(obj, prop);
+    const metaData = getMetadata(prop);
     if (metaData) {
       const optional = metaData.schema.optional;
       if (optional) {

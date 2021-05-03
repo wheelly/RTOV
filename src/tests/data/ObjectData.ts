@@ -18,6 +18,19 @@ export class ObjectData {
 
   description?: any;
 
-  constructor(args : ObjectData) {}
+  constructor(args? : ObjectData) {}
 
+}
+
+@validate
+export class ObjectDataExt extends ObjectData {
+  @property({type: "string", minLength: 5})
+  extended: string = "12345"
+
+  @property({type: "string", minLength: 1})
+  name: string = "Z"
+
+  constructor(args? : ObjectDataExt) {
+    super(args);
+  }
 }
