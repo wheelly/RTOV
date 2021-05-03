@@ -4,5 +4,10 @@ export declare class ObjectData {
     name: string;
     surname: string;
     description?: any;
-    constructor(args: ObjectData);
+    constructor(args?: ObjectData);
+}
+export declare class ObjectDataExt extends ObjectData {
+    extended: string;
+    name: string;
+    constructor(args?: ObjectDataExt);
 }

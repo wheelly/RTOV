@@ -10,7 +10,7 @@ import {RTOVConstructor, ExternCtorPosition} from "./constructor";
 export function validate<T extends { new(...constructorArgs: any[]): any }>(constructorFunction: T) {
 
   //new constructor function
-  let newConstructorFunction: any = function (...constructorArgs: any[]) {
+  const newConstructorFunction: any = function (...constructorArgs: any[]) {
     //overriding constructor - setters instead of properties
     let schema = {};
     let externalCtors : RTOVConstructor[] = []
@@ -29,16 +29,18 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
       let obj = new constructorFunction();
       const ajv: AJV.Ajv = new AJV({allErrors: true});
       //that's why we need to put here args again
-      const {required, properties} = addObjectSetters(ajv, externalCtors, obj, args);
+      const {required, properties} = addObjectSetters(ajv, externalCtors, constructorFunction.prototype, obj, args);
       schema = {type: "object", required, properties};
       return obj;
     }
+
     func.prototype = constructorFunction.prototype;
 
     const obj = new func();
     setReadOnlyProperty(obj, 'schema', schema);
     return obj;
   }
+
   newConstructorFunction.prototype = constructorFunction.prototype;
   return newConstructorFunction;
 }
@@ -47,7 +49,7 @@ export function validate<T extends { new(...constructorArgs: any[]): any }>(cons
     This is property of object to be validated
  */
 export function property(schema: Object, objectConstructor?: RTOVConstructor | ExternCtorPosition) {
-  return function addValidationRule(target: any, propertyKey: string) {
+  return function addValidationRule(target: Object, propertyKey: string) {
     const className = target.constructor.name;
     debug(() => `@property -> ${className}.${propertyKey} schema: ${JSON.stringify(schema)}`);
     Reflect.defineMetadata("validation", {className, schema, objectConstructor}, target, propertyKey);

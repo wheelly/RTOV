@@ -8,7 +8,7 @@ const lib_1 = require("./lib");
  */
 function validate(constructorFunction) {
     //new constructor function
-    let newConstructorFunction = function (...constructorArgs) {
+    const newConstructorFunction = function (...constructorArgs) {
         //overriding constructor - setters instead of properties
         let schema = {};
         let externalCtors = [];
@@ -27,7 +27,7 @@ function validate(constructorFunction) {
             let obj = new constructorFunction();
             const ajv = new AJV({ allErrors: true });
             //that's why we need to put here args again
-            const { required, properties } = lib_1.addObjectSetters(ajv, externalCtors, obj, args);
+            const { required, properties } = lib_1.addObjectSetters(ajv, externalCtors, constructorFunction.prototype, obj, args);
             schema = { type: "object", required, properties };
             return obj;
         };

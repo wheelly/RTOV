@@ -37,4 +37,24 @@ ObjectData = __decorate([
     __metadata("design:paramtypes", [ObjectData])
 ], ObjectData);
 exports.ObjectData = ObjectData;
+let ObjectDataExt = class ObjectDataExt extends ObjectData {
+    constructor(args) {
+        super(args);
+        this.extended = "12345";
+        this.name = "Z";
+    }
+};
+__decorate([
+    RTOV_1.property({ type: "string", minLength: 5 }),
+    __metadata("design:type", String)
+], ObjectDataExt.prototype, "extended", void 0);
+__decorate([
+    RTOV_1.property({ type: "string", minLength: 1 }),
+    __metadata("design:type", String)
+], ObjectDataExt.prototype, "name", void 0);
+ObjectDataExt = __decorate([
+    RTOV_1.validate,
+    __metadata("design:paramtypes", [ObjectDataExt])
+], ObjectDataExt);
+exports.ObjectDataExt = ObjectDataExt;
 //# sourceMappingURL=ObjectData.js.map
